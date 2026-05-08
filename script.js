@@ -1,3 +1,16 @@
+let currentFilter = "all";
+const filterButtons = document.querySelectorAll(".filter-btn");
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+
+    filterButtons.forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    currentFilter = btn.dataset.filter;
+    renderTransactions();
+  });
+});
+
 const date = document.getElementById("date");
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
@@ -48,25 +61,31 @@ function updateBalance() {
 function renderTransactions() {
   list.innerHTML = "";
 
-  transactions.forEach((transaction, index) => {
+  let filtered = transactions;
 
-    const li = document.createElement("li");
+  if (currentFilter !== "all") {
+    filtered = transactions.filter(t => t.type === currentFilter);
+  }
 
-    li.classList.add(transaction.type);
+  filtered.forEach((transaction) => {
 
-    li.innerHTML = `
-      <span>
-        ${transaction.title} - ₦${transaction.amount}
-        <small>(${transaction.date})</small>
-      </span>
+  const li = document.createElement("li");
 
-      <button class="delete-btn" onclick="deleteTransaction(${index})">
-        X
-      </button>
-    `;
+  li.classList.add(transaction.type);
 
-    list.appendChild(li);
-  });
+  li.innerHTML = `
+    <span>
+      ${transaction.title} - ₦${transaction.amount}
+      <small>(${transaction.date})</small>
+    </span>
+
+    <button class="delete-btn" onclick="deleteTransaction(${transactions.indexOf(transaction)})">
+      X
+    </button>
+  `;
+
+  list.appendChild(li);
+});
 
   updateBalance();
 }
