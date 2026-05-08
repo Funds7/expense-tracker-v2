@@ -79,3 +79,25 @@ li{
   padding:5px 10px;
   border-radius:5px;
 }
+.summary{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:20px;
+}
+
+.income-box,
+.expense-box{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  color:white;
+}
+
+.income-box{
+  background:green;
+}
+
+.expense-box{
+  background:red;
+}
