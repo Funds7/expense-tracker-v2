@@ -32,27 +32,16 @@
 
     <form id="transaction-form">
 
-      <input
-        type="text"
-        id="title"
-        placeholder="Enter title"
-        required
-      >
+<input type="text" id="title" placeholder="Enter title" required>
+<input type="number" id="amount" placeholder="Enter amount" required>
+<input type="date" id="date" required>
 
-      <input
-        type="number"
-        id="amount"
-        placeholder="Enter amount"
-        required
-      >
+<select id="type">
+  <option value="income">Income</option>
+  <option value="expense">Expense</option>
+</select>
 
-      <select id="type">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-
-      <button type="submit">Add Transaction</button>
-
+<button type="submit">Add Transaction</button>
     </form>
 
     <ul id="list"></ul>
