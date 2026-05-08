@@ -1,4 +1,4 @@
-localStorage.clear();
+const date = document.getElementById("date");
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
 const amount = document.getElementById("amount");
@@ -57,6 +57,7 @@ function renderTransactions() {
     li.innerHTML = `
       <span>
         ${transaction.title} - ₦${transaction.amount}
+        <small>(${transaction.date})</small>
       </span>
 
       <button class="delete-btn" onclick="deleteTransaction(${index})">
@@ -81,10 +82,11 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const newTransaction = {
-    title: title.value,
-    amount: Number(amount.value),
-    type: type.value
-  };
+  title: title.value,
+  amount: Number(amount.value),
+  type: type.value,
+  date: date.value
+};
 
   transactions.push(newTransaction);
 
