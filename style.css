@@ -18,6 +18,7 @@ h1{
   text-align:center;
 }
 
+/* BALANCE */
 .balance-box{
   text-align:center;
   margin-bottom:20px;
@@ -27,6 +28,31 @@ h1{
   color:green;
 }
 
+/* SUMMARY */
+.summary{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:20px;
+}
+
+.income-box{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  color:white;
+  background:#1f9d55;
+}
+
+.expense-box{
+  flex:1;
+  padding:10px;
+  border-radius:10px;
+  color:white;
+  background:#e3342f;
+}
+
+/* FORM */
 form{
   display:flex;
   flex-direction:column;
@@ -42,12 +68,20 @@ button{
   font-size:16px;
 }
 
+/* BUTTON */
 button{
-  background:black;
+  background: linear-gradient(135deg, #000, #333);
   color:white;
   border:none;
+  cursor:pointer;
+  transition:0.2s;
 }
 
+button:hover{
+  transform: scale(1.03);
+}
+
+/* LIST */
 ul{
   list-style:none;
   padding:0;
@@ -62,6 +96,12 @@ li{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  transition: 0.2s;
+}
+
+li:hover{
+  transform: translateY(-2px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
 .expense{
@@ -72,6 +112,7 @@ li{
   border-right:5px solid green;
 }
 
+/* DELETE */
 .delete-btn{
   background:red;
   color:white;
@@ -79,38 +120,18 @@ li{
   padding:5px 10px;
   border-radius:5px;
 }
-/* ACTION BUTTONS (Edit & Delete) */
-button[onclick*="editTransaction"] {
-  background: #333;
-  color: white;
-  margin-right: 5px;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
-}
 
-.summary{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-top:20px;
-}
-
-.income-box,
-.expense-box{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
+/* EDIT BUTTON (FIXED) */
+.edit-btn{
+  background:#333;
   color:white;
+  margin-right:5px;
+  border:none;
+  padding:5px 10px;
+  border-radius:5px;
 }
 
-.income-box{
-  background:green;
-}
-
-.expense-box{
-  background:red;
-}
+/* FILTER */
 .filter-box{
   display:flex;
   gap:10px;
@@ -131,4 +152,18 @@ button[onclick*="editTransaction"] {
 .filter-btn.active{
   background:black;
   color:white;
+}
+
+/* DARK MODE */
+body.dark {
+  background: #121212;
+  color: white;
+}
+
+body.dark .container {
+  background: #1e1e1e;
+}
+
+body.dark li {
+  background: #2a2a2a;
 }
