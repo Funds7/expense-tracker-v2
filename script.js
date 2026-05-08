@@ -1,5 +1,6 @@
 let currentFilter = "all";
 
+// FILTER BUTTONS
 const filterButtons = document.querySelectorAll(".filter-btn");
 
 filterButtons.forEach((btn) => {
@@ -12,7 +13,7 @@ filterButtons.forEach((btn) => {
   });
 });
 
-// DOM
+// DOM ELEMENTS
 const date = document.getElementById("date");
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
@@ -22,10 +23,27 @@ const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
+const toggle = document.getElementById("darkToggle");
+
+// DARK MODE
+if (toggle) {
+  toggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+
+    localStorage.setItem(
+      "darkMode",
+      document.body.classList.contains("dark")
+    );
+  });
+}
+
+// restore dark mode
+if (localStorage.getItem("darkMode") === "true") {
+  document.body.classList.add("dark");
+}
 
 // DATA
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
 let editId = null;
 
 // SAVE
@@ -33,7 +51,7 @@ function saveTransactions() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// BALANCE
+// BALANCE CALC
 function updateBalance() {
   let total = 0;
   let incomeTotal = 0;
@@ -99,6 +117,8 @@ function deleteTransaction(id) {
 function editTransaction(id) {
   const transaction = transactions.find(t => t.id === id);
 
+  if (!transaction) return;
+
   title.value = transaction.title;
   amount.value = transaction.amount;
   type.value = transaction.type;
@@ -139,3 +159,4 @@ form.addEventListener("submit", (e) => {
 
 // INIT
 renderTransactions();
+form.querySelector("button").textContent = "Add Transaction";
