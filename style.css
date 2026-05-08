@@ -79,6 +79,16 @@ li{
   padding:5px 10px;
   border-radius:5px;
 }
+/* ACTION BUTTONS (Edit & Delete) */
+button[onclick*="editTransaction"] {
+  background: #333;
+  color: white;
+  margin-right: 5px;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
 .summary{
   display:flex;
   justify-content:space-between;
