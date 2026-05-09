@@ -25,7 +25,6 @@ const filterButtons =
 
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-
     filterButtons.forEach((b) =>
       b.classList.remove("active")
     );
@@ -41,7 +40,6 @@ filterButtons.forEach((btn) => {
 // DARK MODE
 if (toggle) {
   toggle.addEventListener("click", () => {
-
     document.body.classList.toggle("dark");
 
     localStorage.setItem(
@@ -70,44 +68,23 @@ let chart;
 
 // SAVE
 function saveTransactions() {
-
   localStorage.setItem(
     "transactions",
     JSON.stringify(transactions)
   );
 }
 
-// EMOJI SYSTEM
-function getEmoji(title) {
-
-  const text = title.toLowerCase();
-
-  if (text.includes("food")) return "🍔";
-  if (text.includes("salary")) return "💰";
-  if (text.includes("transport")) return "🚗";
-  if (text.includes("drive")) return "🚗";
-  if (text.includes("shop")) return "🛒";
-  if (text.includes("data")) return "📶";
-
-  return "📌";
-}
-
 // BALANCE
 function updateBalance() {
-
   let total = 0;
   let incomeTotal = 0;
   let expenseTotal = 0;
 
   transactions.forEach((t) => {
-
     if (t.type === "income") {
-
       total += t.amount;
       incomeTotal += t.amount;
-
     } else {
-
       total -= t.amount;
       expenseTotal += t.amount;
     }
@@ -120,7 +97,6 @@ function updateBalance() {
 
 // CHART
 function renderChart() {
-
   const incomeData = transactions
     .filter((t) => t.type === "income")
     .reduce((acc, t) => acc + t.amount, 0);
@@ -129,18 +105,12 @@ function renderChart() {
     .filter((t) => t.type === "expense")
     .reduce((acc, t) => acc + t.amount, 0);
 
-  if (chart) {
-    chart.destroy();
-  }
+  if (chart) chart.destroy();
 
   chart = new Chart(chartCanvas, {
-
     type: "pie",
-
     data: {
-
       labels: ["Income", "Expense"],
-
       datasets: [{
         data: [incomeData, expenseData]
       }]
@@ -150,22 +120,17 @@ function renderChart() {
 
 // RENDER
 function renderTransactions() {
-
   list.innerHTML = "";
 
   let filtered = [...transactions].reverse();
 
-  // FILTER TYPE
   if (currentFilter !== "all") {
-
     filtered = filtered.filter(
       (t) => t.type === currentFilter
     );
   }
 
-  // SEARCH
   if (search) {
-
     const searchValue =
       search.value.toLowerCase();
 
@@ -176,25 +141,17 @@ function renderTransactions() {
     );
   }
 
-  // EMPTY STATE
   if (filtered.length === 0) {
-
     list.innerHTML = `
-      <p class="empty">
-        No transactions found
-      </p>
+      <p class="empty">No transactions found</p>
     `;
-
     updateBalance();
     renderChart();
-
     return;
   }
 
   filtered.forEach((transaction) => {
-
-    const li =
-      document.createElement("li");
+    const li = document.createElement("li");
 
     li.classList.add(transaction.type);
 
@@ -203,28 +160,12 @@ function renderTransactions() {
         ${transaction.category}
         ${transaction.title}
         - ₦${transaction.amount}
-
-        <small>
-          (${transaction.date})
-        </small>
+        <small>(${transaction.date})</small>
       </span>
 
       <div class="actions">
-
-        <button
-          class="edit-btn"
-          onclick="editTransaction(${transaction.id})"
-        >
-          Edit
-        </button>
-
-        <button
-          class="delete-btn"
-          onclick="deleteTransaction(${transaction.id})"
-        >
-          X
-        </button>
-
+        <button class="edit-btn" onclick="editTransaction(${transaction.id})">Edit</button>
+        <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">X</button>
       </div>
     `;
 
@@ -232,17 +173,12 @@ function renderTransactions() {
   });
 
   updateBalance();
-
   renderChart();
 }
 
 // DELETE
 function deleteTransaction(id) {
-
-  const confirmDelete = confirm(
-    "Delete this transaction?"
-  );
-
+  const confirmDelete = confirm("Delete this transaction?");
   if (!confirmDelete) return;
 
   transactions = transactions.filter(
@@ -250,17 +186,13 @@ function deleteTransaction(id) {
   );
 
   saveTransactions();
-
   renderTransactions();
 }
 
 // EDIT
 function editTransaction(id) {
-
   const transaction =
-    transactions.find(
-      (t) => t.id === id
-    );
+    transactions.find((t) => t.id === id);
 
   if (!transaction) return;
 
@@ -278,51 +210,30 @@ function editTransaction(id) {
 
 // SUBMIT
 form.addEventListener("submit", (e) => {
-
   e.preventDefault();
 
-  // VALIDATION
   if (
     title.value.trim() === "" ||
     amount.value.trim() === ""
   ) {
-
     alert("Please fill all fields");
-
     return;
   }
 
   const transaction = {
-
-    id:
-      editId === null
-        ? Date.now()
-        : editId,
-
+    id: editId === null ? Date.now() : editId,
     title: title.value,
-
     amount: Number(amount.value),
-
     type: type.value,
-
     date: date.value,
-
     category: category.value
   };
 
-  // ADD
   if (editId === null) {
-
     transactions.push(transaction);
-  }
-
-  // UPDATE
-  else {
-
+  } else {
     transactions = transactions.map((t) =>
-      t.id === editId
-        ? transaction
-        : t
+      t.id === editId ? transaction : t
     );
 
     editId = null;
@@ -332,19 +243,13 @@ form.addEventListener("submit", (e) => {
   }
 
   saveTransactions();
-
   renderTransactions();
-
   form.reset();
 });
 
-// SEARCH LISTENER
+// SEARCH
 if (search) {
-
-  search.addEventListener(
-    "input",
-    renderTransactions
-  );
+  search.addEventListener("input", renderTransactions);
 }
 
 // INIT
