@@ -30,10 +30,26 @@ h1{
 
 /* SUMMARY */
 .summary{
-  display:flex;
-  justify-content:space-between;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
   gap:10px;
   margin-top:20px;
+}
+
+#expenseChart{
+  margin-top:20px;
+  background:white;
+  padding:15px;
+  border-radius:15px;
+}
+
+body.dark #expenseChart{
+  background:#2a2a2a;
+}
+
+body{
+  max-width:500px;
+  margin:auto;
 }
 
 .income-box{
