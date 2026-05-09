@@ -66,7 +66,38 @@
   <button class="filter-btn" data-filter="income">Income</button>
   <button class="filter-btn" data-filter="expense">Expense</button>
 </div>
+    
+<div class="monthly-dashboard">
+  <h2>📅 Monthly Report</h2>
 
+  <div class="dash-grid">
+    <div class="dash-card">
+      <h4>Income</h4>
+      <p id="m-income">₦0</p>
+    </div>
+
+    <div class="dash-card">
+      <h4>Expense</h4>
+      <p id="m-expense">₦0</p>
+    </div>
+
+    <div class="dash-card">
+      <h4>Net</h4>
+      <p id="m-net">₦0</p>
+    </div>
+
+    <div class="dash-card">
+      <h4>Transactions</h4>
+      <p id="m-count">0</p>
+    </div>
+
+    <div class="dash-card">
+      <h4>Biggest Expense</h4>
+      <p id="m-biggest">₦0</p>
+    </div>
+  </div>
+</div>
+    
 <canvas id="expenseChart"></canvas>
 
 <ul id="list"></ul>
