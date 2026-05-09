@@ -6,19 +6,29 @@ const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
 const amount = document.getElementById("amount");
 const type = document.getElementById("type");
+const category = document.getElementById("category");
+
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
+
 const toggle = document.getElementById("darkToggle");
 const search = document.getElementById("search");
 
+const chartCanvas =
+  document.getElementById("expenseChart");
+
 // FILTER BUTTONS
-const filterButtons = document.querySelectorAll(".filter-btn");
+const filterButtons =
+  document.querySelectorAll(".filter-btn");
 
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-    filterButtons.forEach((b) => b.classList.remove("active"));
+
+    filterButtons.forEach((b) =>
+      b.classList.remove("active")
+    );
 
     btn.classList.add("active");
 
@@ -31,6 +41,7 @@ filterButtons.forEach((btn) => {
 // DARK MODE
 if (toggle) {
   toggle.addEventListener("click", () => {
+
     document.body.classList.toggle("dark");
 
     localStorage.setItem(
@@ -41,18 +52,25 @@ if (toggle) {
 }
 
 // RESTORE DARK MODE
-if (localStorage.getItem("darkMode") === "true") {
+if (
+  localStorage.getItem("darkMode") === "true"
+) {
   document.body.classList.add("dark");
 }
 
 // DATA
 let transactions =
-  JSON.parse(localStorage.getItem("transactions")) || [];
+  JSON.parse(
+    localStorage.getItem("transactions")
+  ) || [];
 
 let editId = null;
 
+let chart;
+
 // SAVE
 function saveTransactions() {
+
   localStorage.setItem(
     "transactions",
     JSON.stringify(transactions)
@@ -61,6 +79,7 @@ function saveTransactions() {
 
 // EMOJI SYSTEM
 function getEmoji(title) {
+
   const text = title.toLowerCase();
 
   if (text.includes("food")) return "🍔";
@@ -75,15 +94,20 @@ function getEmoji(title) {
 
 // BALANCE
 function updateBalance() {
+
   let total = 0;
   let incomeTotal = 0;
   let expenseTotal = 0;
 
   transactions.forEach((t) => {
+
     if (t.type === "income") {
+
       total += t.amount;
       incomeTotal += t.amount;
+
     } else {
+
       total -= t.amount;
       expenseTotal += t.amount;
     }
@@ -94,14 +118,46 @@ function updateBalance() {
   expense.textContent = `₦${expenseTotal}`;
 }
 
+// CHART
+function renderChart() {
+
+  const incomeData = transactions
+    .filter((t) => t.type === "income")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  const expenseData = transactions
+    .filter((t) => t.type === "expense")
+    .reduce((acc, t) => acc + t.amount, 0);
+
+  if (chart) {
+    chart.destroy();
+  }
+
+  chart = new Chart(chartCanvas, {
+
+    type: "pie",
+
+    data: {
+
+      labels: ["Income", "Expense"],
+
+      datasets: [{
+        data: [incomeData, expenseData]
+      }]
+    }
+  });
+}
+
 // RENDER
 function renderTransactions() {
+
   list.innerHTML = "";
 
   let filtered = [...transactions].reverse();
 
   // FILTER TYPE
   if (currentFilter !== "all") {
+
     filtered = filtered.filter(
       (t) => t.type === currentFilter
     );
@@ -109,16 +165,20 @@ function renderTransactions() {
 
   // SEARCH
   if (search) {
+
     const searchValue =
       search.value.toLowerCase();
 
     filtered = filtered.filter((t) =>
-      t.title.toLowerCase().includes(searchValue)
+      t.title
+        .toLowerCase()
+        .includes(searchValue)
     );
   }
 
   // EMPTY STATE
   if (filtered.length === 0) {
+
     list.innerHTML = `
       <p class="empty">
         No transactions found
@@ -126,18 +186,21 @@ function renderTransactions() {
     `;
 
     updateBalance();
+    renderChart();
 
     return;
   }
 
   filtered.forEach((transaction) => {
-    const li = document.createElement("li");
+
+    const li =
+      document.createElement("li");
 
     li.classList.add(transaction.type);
 
     li.innerHTML = `
       <span>
-        ${getEmoji(transaction.title)}
+        ${transaction.category}
         ${transaction.title}
         - ₦${transaction.amount}
 
@@ -147,7 +210,11 @@ function renderTransactions() {
       </span>
 
       <div class="actions">
-        <button class="edit-btn" onclick="editTransaction(${transaction.id})">
+
+        <button
+          class="edit-btn"
+          onclick="editTransaction(${transaction.id})"
+        >
           Edit
         </button>
 
@@ -157,6 +224,7 @@ function renderTransactions() {
         >
           X
         </button>
+
       </div>
     `;
 
@@ -164,10 +232,13 @@ function renderTransactions() {
   });
 
   updateBalance();
+
+  renderChart();
 }
 
 // DELETE
 function deleteTransaction(id) {
+
   const confirmDelete = confirm(
     "Delete this transaction?"
   );
@@ -185,9 +256,11 @@ function deleteTransaction(id) {
 
 // EDIT
 function editTransaction(id) {
-  const transaction = transactions.find(
-    (t) => t.id === id
-  );
+
+  const transaction =
+    transactions.find(
+      (t) => t.id === id
+    );
 
   if (!transaction) return;
 
@@ -195,6 +268,7 @@ function editTransaction(id) {
   amount.value = transaction.amount;
   type.value = transaction.type;
   date.value = transaction.date;
+  category.value = transaction.category;
 
   editId = id;
 
@@ -204,6 +278,7 @@ function editTransaction(id) {
 
 // SUBMIT
 form.addEventListener("submit", (e) => {
+
   e.preventDefault();
 
   // VALIDATION
@@ -211,28 +286,43 @@ form.addEventListener("submit", (e) => {
     title.value.trim() === "" ||
     amount.value.trim() === ""
   ) {
+
     alert("Please fill all fields");
 
     return;
   }
 
-  const newTransaction = {
-    id: editId ? editId : Date.now(),
-    title: title.value.trim(),
+  const transaction = {
+
+    id:
+      editId === null
+        ? Date.now()
+        : editId,
+
+    title: title.value,
+
     amount: Number(amount.value),
+
     type: type.value,
-    date: date.value
+
+    date: date.value,
+
+    category: category.value
   };
 
   // ADD
   if (editId === null) {
-    transactions.push(newTransaction);
+
+    transactions.push(transaction);
   }
 
   // UPDATE
   else {
+
     transactions = transactions.map((t) =>
-      t.id === editId ? newTransaction : t
+      t.id === editId
+        ? transaction
+        : t
     );
 
     editId = null;
@@ -250,6 +340,7 @@ form.addEventListener("submit", (e) => {
 
 // SEARCH LISTENER
 if (search) {
+
   search.addEventListener(
     "input",
     renderTransactions
