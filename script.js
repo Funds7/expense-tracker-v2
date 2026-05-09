@@ -208,24 +208,22 @@ function editTransaction(id) {
     "Update Transaction";
 }
 
-// SUBMIT
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  if (
-    title.value.trim() === "" ||
-    amount.value.trim() === ""
-  ) {
-    alert("Please fill all fields");
+  const amt = Number(amount.value);
+
+  if (!amt || amt <= 0) {
+    alert("Enter valid amount");
     return;
   }
 
   const transaction = {
     id: editId === null ? Date.now() : editId,
-    title: title.value,
-    amount: Number(amount.value),
+    title: title.value || category.value,
+    amount: amt,
     type: type.value,
-    date: date.value,
+    date: date.value || new Date().toLocaleDateString(),
     category: category.value
   };
 
@@ -237,7 +235,6 @@ form.addEventListener("submit", (e) => {
     );
 
     editId = null;
-
     form.querySelector("button").textContent =
       "Add Transaction";
   }
