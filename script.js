@@ -98,7 +98,7 @@ function updateBalance() {
 function renderTransactions() {
   list.innerHTML = "";
 
-  let filtered = transactions;
+  let filtered = [...transactions].reverse();
 
   // FILTER TYPE
   if (currentFilter !== "all") {
@@ -147,7 +147,7 @@ function renderTransactions() {
       </span>
 
       <div class="actions">
-        <button onclick="editTransaction(${transaction.id})">
+        <button class="edit-btn" onclick="editTransaction(${transaction.id})">
           Edit
         </button>
 
