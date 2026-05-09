@@ -1,19 +1,6 @@
 let currentFilter = "all";
 
-// FILTER BUTTONS
-const filterButtons = document.querySelectorAll(".filter-btn");
-
-filterButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    filterButtons.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-
-    currentFilter = btn.dataset.filter;
-    renderTransactions();
-  });
-});
-
-// DOM ELEMENTS
+// DOM
 const date = document.getElementById("date");
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
@@ -24,6 +11,22 @@ const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
 const toggle = document.getElementById("darkToggle");
+const search = document.getElementById("search");
+
+// FILTER BUTTONS
+const filterButtons = document.querySelectorAll(".filter-btn");
+
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    filterButtons.forEach((b) => b.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    currentFilter = btn.dataset.filter;
+
+    renderTransactions();
+  });
+});
 
 // DARK MODE
 if (toggle) {
@@ -37,21 +40,40 @@ if (toggle) {
   });
 }
 
-// restore dark mode
+// RESTORE DARK MODE
 if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
 // DATA
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let transactions =
+  JSON.parse(localStorage.getItem("transactions")) || [];
+
 let editId = null;
 
 // SAVE
 function saveTransactions() {
-  localStorage.setItem("transactions", JSON.stringify(transactions));
+  localStorage.setItem(
+    "transactions",
+    JSON.stringify(transactions)
+  );
 }
 
-// BALANCE CALC
+// EMOJI SYSTEM
+function getEmoji(title) {
+  const text = title.toLowerCase();
+
+  if (text.includes("food")) return "🍔";
+  if (text.includes("salary")) return "💰";
+  if (text.includes("transport")) return "🚗";
+  if (text.includes("drive")) return "🚗";
+  if (text.includes("shop")) return "🛒";
+  if (text.includes("data")) return "📶";
+
+  return "📌";
+}
+
+// BALANCE
 function updateBalance() {
   let total = 0;
   let incomeTotal = 0;
@@ -78,8 +100,34 @@ function renderTransactions() {
 
   let filtered = transactions;
 
+  // FILTER TYPE
   if (currentFilter !== "all") {
-    filtered = transactions.filter(t => t.type === currentFilter);
+    filtered = filtered.filter(
+      (t) => t.type === currentFilter
+    );
+  }
+
+  // SEARCH
+  if (search) {
+    const searchValue =
+      search.value.toLowerCase();
+
+    filtered = filtered.filter((t) =>
+      t.title.toLowerCase().includes(searchValue)
+    );
+  }
+
+  // EMPTY STATE
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <p class="empty">
+        No transactions found
+      </p>
+    `;
+
+    updateBalance();
+
+    return;
   }
 
   filtered.forEach((transaction) => {
@@ -89,13 +137,26 @@ function renderTransactions() {
 
     li.innerHTML = `
       <span>
-        ${transaction.title} - ₦${transaction.amount}
-        <small>(${transaction.date})</small>
+        ${getEmoji(transaction.title)}
+        ${transaction.title}
+        - ₦${transaction.amount}
+
+        <small>
+          (${transaction.date})
+        </small>
       </span>
 
-      <div>
-        <button onclick="editTransaction(${transaction.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">X</button>
+      <div class="actions">
+        <button onclick="editTransaction(${transaction.id})">
+          Edit
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteTransaction(${transaction.id})"
+        >
+          X
+        </button>
       </div>
     `;
 
@@ -107,15 +168,26 @@ function renderTransactions() {
 
 // DELETE
 function deleteTransaction(id) {
-  transactions = transactions.filter(t => t.id !== id);
+  const confirmDelete = confirm(
+    "Delete this transaction?"
+  );
+
+  if (!confirmDelete) return;
+
+  transactions = transactions.filter(
+    (t) => t.id !== id
+  );
 
   saveTransactions();
+
   renderTransactions();
 }
 
 // EDIT
 function editTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
+  const transaction = transactions.find(
+    (t) => t.id === id
+  );
 
   if (!transaction) return;
 
@@ -126,37 +198,66 @@ function editTransaction(id) {
 
   editId = id;
 
-  form.querySelector("button").textContent = "Update Transaction";
+  form.querySelector("button").textContent =
+    "Update Transaction";
 }
 
 // SUBMIT
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
+  // VALIDATION
+  if (
+    title.value.trim() === "" ||
+    amount.value.trim() === ""
+  ) {
+    alert("Please fill all fields");
+
+    return;
+  }
+
   const newTransaction = {
     id: editId ? editId : Date.now(),
-    title: title.value,
+    title: title.value.trim(),
     amount: Number(amount.value),
     type: type.value,
     date: date.value
   };
 
+  // ADD
   if (editId === null) {
     transactions.push(newTransaction);
-  } else {
-    transactions = transactions.map(t =>
+  }
+
+  // UPDATE
+  else {
+    transactions = transactions.map((t) =>
       t.id === editId ? newTransaction : t
     );
 
     editId = null;
-    form.querySelector("button").textContent = "Add Transaction";
+
+    form.querySelector("button").textContent =
+      "Add Transaction";
   }
 
   saveTransactions();
+
   renderTransactions();
+
   form.reset();
 });
 
+// SEARCH LISTENER
+if (search) {
+  search.addEventListener(
+    "input",
+    renderTransactions
+  );
+}
+
 // INIT
 renderTransactions();
-form.querySelector("button").textContent = "Add Transaction";
+
+form.querySelector("button").textContent =
+  "Add Transaction";
