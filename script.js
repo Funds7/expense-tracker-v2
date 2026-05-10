@@ -60,17 +60,33 @@ function deleteTransaction(id) {
 
 // ================= EDIT =================
 function editTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
+  const transaction = transactions.find(
+    t => t.id === id
+  );
 
   if (!transaction) return;
 
-  document.getElementById("title").value = transaction.title;
-  document.getElementById("amount").value = transaction.amount;
-  document.getElementById("type").value = transaction.type;
-  document.getElementById("category").value = transaction.category;
-  document.getElementById("date").value = transaction.date;
+  document.getElementById("title").value =
+    transaction.title;
+
+  document.getElementById("amount").value =
+    transaction.amount;
+
+  document.getElementById("type").value =
+    transaction.type;
+
+  document.getElementById("category").value =
+    transaction.category;
+
+  document.getElementById("date").value =
+    transaction.date;
 
   editId = id;
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
 // ================= RENDER LIST =================
@@ -190,49 +206,57 @@ function updateReports() {
 
 // ================= FORM =================
 if (form) {
+
   form.addEventListener("submit", e => {
+
     e.preventDefault();
 
-    const title = document.getElementById("title");
-    const amount = document.getElementById("amount");
-    const type = document.getElementById("type");
-    const category = document.getElementById("category");
-    const date = document.getElementById("date");
+    const title =
+      document.getElementById("title");
 
+    const amount =
+      document.getElementById("amount");
+
+    const type =
+      document.getElementById("type");
+
+    const category =
+      document.getElementById("category");
+
+    const date =
+      document.getElementById("date");
+
+    const transactionData = {
+      id: editId || Date.now(),
+      title: title.value.trim(),
+      amount: Number(amount.value),
+      type: type.value,
+      category: category.value,
+      date: date.value
+    };
+
+    // EDIT MODE
     if (editId) {
-      transactions = transactions.map(t => {
-        if (t.id === editId) {
-          return {
-            ...t,
-            title: title.value,
-            amount: Number(amount.value),
-            type: type.value,
-            category: category.value,
-            date: date.value
-          };
-        }
 
-        return t;
-      });
+      transactions = transactions.map(t =>
+        t.id === editId ? transactionData : t
+      );
 
       editId = null;
 
     } else {
-      transactions.push({
-        id: Date.now(),
-        title: title.value,
-        amount: Number(amount.value),
-        type: type.value,
-        category: category.value,
-        date: date.value
-      });
+
+      // ADD MODE
+      transactions.push(transactionData);
     }
 
     save();
+
     form.reset();
+
     renderTransactions();
   });
-}
 
+}
 // ================= INIT =================
 renderTransactions();
