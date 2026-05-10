@@ -316,17 +316,30 @@ body.dark .bottom-nav a{
   animation:spin 1s linear infinite;
 }
 
-/* ANIMATIONS */
-@keyframes spin{
-  100%{ transform:rotate(360deg); }
+/* ================= NAVIGATION ================= */
+.nav{
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  margin:15px 0 20px;
 }
 
-@keyframes fadeOut{
-  to{
-    opacity:0;
-    visibility:hidden;
-  }
+.nav a{
+  text-decoration:none;
+  color:#0f172a;
+  font-weight:600;
+  font-size:15px;
+  transition:0.2s;
 }
+
+.nav a:hover{
+  opacity:0.7;
+}
+
+body.dark .nav a{
+  color:white;
+}
+
 /* ================= PREMIUM BALANCE ================= */
 .premium-balance-card{
   background:linear-gradient(135deg,#0f172a,#1e293b);
@@ -415,7 +428,7 @@ body.dark .bottom-nav a{
 
 /* CHART SIZE */
 .chart-card canvas{
-  max-height:260px;
+  max-height:220px !important;
 }
 
 /* ================= DARK MODE ================= */
@@ -429,4 +442,24 @@ body.dark .chart-header p{
 
 body.dark .premium-card{
   background:rgba(255,255,255,0.05);
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:500px){
+
+  .premium-balance-card{
+    padding:18px;
+  }
+
+  .premium-card{
+    padding:12px;
+  }
+
+  .premium-card h3{
+    font-size:18px;
+  }
+
+  .chart-card canvas{
+    max-height:200px !important;
+  }
 }
