@@ -19,7 +19,12 @@ body{
 h1{
   text-align:center;
 }
-
+#edit-status{
+  text-align:center;
+  margin:10px 0;
+  font-weight:bold;
+  font-size:14px;
+}
 /* BALANCE */
 .balance-box{
   text-align:center;
