@@ -27,7 +27,7 @@ function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// ================= DARK MODE =================
+// DARK MODE
 if (toggle) {
   toggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
@@ -39,7 +39,7 @@ if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
-// ================= FILTER =================
+// FILTER
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".filter-btn")
@@ -52,7 +52,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
   });
 });
 
-// ================= BALANCE =================
+// BALANCE
 function updateBalance() {
   if (!balance && !income && !expense) return;
 
@@ -73,7 +73,7 @@ function updateBalance() {
   if (expense) expense.textContent = `₦${exp}`;
 }
 
-// ================= CHART =================
+// CHART
 function renderChart() {
   if (!chartCanvas) return;
 
@@ -94,7 +94,7 @@ function renderChart() {
   });
 }
 
-// ================= RENDER =================
+// RENDER
 function renderTransactions() {
   if (!list) return;
 
@@ -141,7 +141,7 @@ function renderTransactions() {
   updateWeeklyReport();
 }
 
-// ================= DELETE =================
+// DELETE
 function remove(id) {
   if (!confirm("Delete this transaction?")) return;
 
@@ -150,7 +150,7 @@ function remove(id) {
   renderTransactions();
 }
 
-// ================= EDIT =================
+// EDIT
 function edit(id) {
   const t = transactions.find(t => t.id === id);
   if (!t) return;
@@ -162,15 +162,12 @@ function edit(id) {
   if (date) date.value = t.date;
 
   editId = id;
-
-  if (form) {
-    form.querySelector("button").textContent = "Update Transaction";
-  }
+  if (form) form.querySelector("button").textContent = "Update Transaction";
 }
 
-// ================= ADD =================
+// ADD
 if (form) {
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", e => {
     e.preventDefault();
 
     const amt = Number(amount.value);
@@ -201,16 +198,11 @@ if (form) {
   });
 }
 
-// ================= SEARCH =================
+// SEARCH
 search?.addEventListener("input", renderTransactions);
 
-// ================= MONTHLY REPORT =================
+// MONTHLY REPORT
 function updateMonthlyReport() {
-  const el = (id, value) => {
-    const e = document.getElementById(id);
-    if (e) e.textContent = `₦${value}`;
-  };
-
   const now = new Date();
 
   const monthly = transactions.filter(t => {
@@ -229,20 +221,20 @@ function updateMonthlyReport() {
     }
   });
 
-  el("m-income", inc);
-  el("m-expense", exp);
-  el("m-net", inc - exp);
-  el("m-count", monthly.length);
-  el("m-biggest", big);
-}
-
-// ================= WEEKLY REPORT =================
-function updateWeeklyReport() {
-  const el = (id, value) => {
-    const e = document.getElementById(id);
-    if (e) e.textContent = `₦${value}`;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `₦${value}`;
   };
 
+  set("m-income", inc);
+  set("m-expense", exp);
+  set("m-net", inc - exp);
+  set("m-count", monthly.length);
+  set("m-biggest", big);
+}
+
+// WEEKLY REPORT
+function updateWeeklyReport() {
   const now = new Date();
 
   const weekly = transactions.filter(t => {
@@ -261,12 +253,17 @@ function updateWeeklyReport() {
     }
   });
 
-  el("w-income", inc);
-  el("w-expense", exp);
-  el("w-net", inc - exp);
-  el("w-count", weekly.length);
-  el("w-biggest", big);
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `₦${value}`;
+  };
+
+  set("w-income", inc);
+  set("w-expense", exp);
+  set("w-net", inc - exp);
+  set("w-count", weekly.length);
+  set("w-biggest", big);
 }
 
-// ================= INIT =================
+// INIT
 renderTransactions();
