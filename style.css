@@ -327,3 +327,106 @@ body.dark .bottom-nav a{
     visibility:hidden;
   }
 }
+/* ================= PREMIUM BALANCE ================= */
+.premium-balance-card{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  border-radius:24px;
+  padding:22px;
+  color:white;
+  margin-bottom:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.18);
+}
+
+.balance-top p{
+  opacity:0.7;
+  margin:0;
+  font-size:14px;
+}
+
+.balance-top h1{
+  margin:8px 0 15px;
+  font-size:34px;
+  font-weight:800;
+}
+
+/* ================= PREMIUM SUMMARY ================= */
+.premium-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.premium-card{
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.08);
+  padding:15px;
+  border-radius:18px;
+  transition:0.25s;
+}
+
+.premium-card:hover{
+  transform:translateY(-3px);
+}
+
+.premium-card span{
+  font-size:13px;
+  opacity:0.8;
+}
+
+.premium-card h3{
+  margin-top:8px;
+  font-size:22px;
+}
+
+.income-card{
+  border:1px solid rgba(34,197,94,0.3);
+}
+
+.expense-card{
+  border:1px solid rgba(239,68,68,0.3);
+}
+
+/* ================= CHART CARD ================= */
+.chart-card{
+  margin-top:20px;
+  background:white;
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.chart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.chart-header h3{
+  margin:0;
+  font-size:18px;
+}
+
+.chart-header p{
+  margin:0;
+  color:gray;
+  font-size:13px;
+}
+
+/* CHART SIZE */
+.chart-card canvas{
+  max-height:260px;
+}
+
+/* ================= DARK MODE ================= */
+body.dark .chart-card{
+  background:#111827;
+}
+
+body.dark .chart-header p{
+  color:#94a3b8;
+}
+
+body.dark .premium-card{
+  background:rgba(255,255,255,0.05);
+}
