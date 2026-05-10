@@ -39,24 +39,40 @@
     <a href="report.html">📊 Reports</a>
   </nav>
 
-  <!-- BALANCE -->
-  <div class="balance-box">
-    <h2>Balance</h2>
-    <h3 id="balance">₦0</h3>
-    <p id="budget-warning"></p>
-    
-    <div class="summary">
-      <div class="income-box">
-        <h4>Income</h4>
-        <p id="income">₦0</p>
-      </div>
+<!-- BALANCE CARD -->
+<div class="premium-balance-card">
 
-      <div class="expense-box">
-        <h4>Expense</h4>
-        <p id="expense">₦0</p>
-      </div>
-    </div>
+  <div class="balance-top">
+    <p>Total Balance</p>
+    <h1 id="balance">₦0</h1>
   </div>
+
+  <div id="budget-warning"></div>
+
+  <div class="premium-summary">
+
+    <div class="premium-card income-card">
+      <span>Income</span>
+      <h3 id="income">₦0</h3>
+    </div>
+
+    <div class="premium-card expense-card">
+      <span>Expense</span>
+      <h3 id="expense">₦0</h3>
+    </div>
+
+  </div>
+</div>
+
+<!-- PREMIUM CHART -->
+<div class="chart-card">
+  <div class="chart-header">
+    <h3>Financial Overview</h3>
+    <p>This Month</p>
+  </div>
+
+  <canvas id="expenseChart"></canvas>
+</div>
 
   <!-- SEARCH -->
   <input type="text" id="search" placeholder="Search transaction..." />
@@ -69,8 +85,6 @@
   </div>
 
   <!-- CHART -->
-  <canvas id="expenseChart"></canvas>
-
   <!-- TRANSACTION LIST -->
   <ul id="list"></ul>
 
