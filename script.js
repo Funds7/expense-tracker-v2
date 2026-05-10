@@ -1,6 +1,6 @@
 let currentFilter = "all";
 
-// DOM (safe across pages)
+// ================= DOM (SAFE) =================
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
 const amount = document.getElementById("amount");
@@ -17,21 +17,24 @@ const search = document.getElementById("search");
 const toggle = document.getElementById("darkToggle");
 const chartCanvas = document.getElementById("expenseChart");
 
-// DATA
+// ================= DATA =================
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let editId = null;
 let chart = null;
 
-// SAVE
+// ================= SAVE =================
 function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// DARK MODE
+// ================= DARK MODE =================
 if (toggle) {
   toggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    localStorage.setItem(
+      "darkMode",
+      document.body.classList.contains("dark")
+    );
   });
 }
 
@@ -39,7 +42,7 @@ if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
-// FILTER
+// ================= FILTER =================
 document.querySelectorAll(".filter-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".filter-btn")
@@ -52,7 +55,7 @@ document.querySelectorAll(".filter-btn").forEach(btn => {
   });
 });
 
-// BALANCE
+// ================= BALANCE =================
 function updateBalance() {
   if (!balance && !income && !expense) return;
 
@@ -73,14 +76,16 @@ function updateBalance() {
   if (expense) expense.textContent = `₦${exp}`;
 }
 
-// CHART
+// ================= CHART =================
 function renderChart() {
   if (!chartCanvas) return;
 
-  const inc = transactions.filter(t => t.type === "income")
+  const inc = transactions
+    .filter(t => t.type === "income")
     .reduce((a, b) => a + b.amount, 0);
 
-  const exp = transactions.filter(t => t.type === "expense")
+  const exp = transactions
+    .filter(t => t.type === "expense")
     .reduce((a, b) => a + b.amount, 0);
 
   if (chart) chart.destroy();
@@ -94,7 +99,7 @@ function renderChart() {
   });
 }
 
-// RENDER
+// ================= RENDER =================
 function renderTransactions() {
   if (!list) return;
 
@@ -126,8 +131,8 @@ function renderTransactions() {
           <small>(${t.date})</small>
         </span>
         <div class="actions">
-          <button class="edit-btn" onclick="edit(${t.id})">Edit</button>
-          <button class="delete-btn" onclick="remove(${t.id})">X</button>
+          <button onclick="edit(${t.id})">Edit</button>
+          <button onclick="remove(${t.id})">X</button>
         </div>
       `;
 
@@ -141,7 +146,7 @@ function renderTransactions() {
   updateWeeklyReport();
 }
 
-// DELETE
+// ================= DELETE =================
 function remove(id) {
   if (!confirm("Delete this transaction?")) return;
 
@@ -150,7 +155,7 @@ function remove(id) {
   renderTransactions();
 }
 
-// EDIT
+// ================= EDIT =================
 function edit(id) {
   const t = transactions.find(t => t.id === id);
   if (!t) return;
@@ -162,10 +167,13 @@ function edit(id) {
   if (date) date.value = t.date;
 
   editId = id;
-  if (form) form.querySelector("button").textContent = "Update Transaction";
+
+  if (form) {
+    form.querySelector("button").textContent = "Update Transaction";
+  }
 }
 
-// ADD
+// ================= ADD =================
 if (form) {
   form.addEventListener("submit", e => {
     e.preventDefault();
@@ -198,15 +206,20 @@ if (form) {
   });
 }
 
-// SEARCH
+// ================= SEARCH =================
 search?.addEventListener("input", renderTransactions);
 
-// MONTHLY REPORT
+// ================= MONTHLY REPORT =================
 function updateMonthlyReport() {
+  const el = (id, value) => {
+    const e = document.getElementById(id);
+    if (e) e.textContent = `₦${value}`;
+  };
+
   const now = new Date();
 
   const monthly = transactions.filter(t => {
-    const d = new Date(t.date);
+    const d = new Date(t.date + "T00:00:00");
     return d.getMonth() === now.getMonth() &&
            d.getFullYear() === now.getFullYear();
   });
@@ -221,26 +234,29 @@ function updateMonthlyReport() {
     }
   });
 
-  const set = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = `₦${value}`;
-  };
-
-  set("m-income", inc);
-  set("m-expense", exp);
-  set("m-net", inc - exp);
-  set("m-count", monthly.length);
-  set("m-biggest", big);
+  el("m-income", inc);
+  el("m-expense", exp);
+  el("m-net", inc - exp);
+  el("m-count", monthly.length);
+  el("m-biggest", big);
 }
 
-// WEEKLY REPORT
+// ================= WEEKLY REPORT =================
 function updateWeeklyReport() {
+  const el = (id, value) => {
+    const e = document.getElementById(id);
+    if (e) e.textContent = `₦${value}`;
+  };
+
   const now = new Date();
 
   const weekly = transactions.filter(t => {
-    const d = new Date(t.date);
-    const diff = (now - d) / (1000 * 60 * 60 * 24);
-    return diff <= 7;
+    const d = new Date(t.date + "T00:00:00");
+
+    const diffTime = now.getTime() - d.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    return diffDays >= 0 && diffDays <= 7;
   });
 
   let inc = 0, exp = 0, big = 0;
@@ -253,17 +269,12 @@ function updateWeeklyReport() {
     }
   });
 
-  const set = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = `₦${value}`;
-  };
-
-  set("w-income", inc);
-  set("w-expense", exp);
-  set("w-net", inc - exp);
-  set("w-count", weekly.length);
-  set("w-biggest", big);
+  el("w-income", inc);
+  el("w-expense", exp);
+  el("w-net", inc - exp);
+  el("w-count", weekly.length);
+  el("w-biggest", big);
 }
 
-// INIT
+// ================= INIT =================
 renderTransactions();
