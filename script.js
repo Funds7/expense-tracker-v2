@@ -1,31 +1,37 @@
 let currentFilter = "all";
 
 // DOM
-const date = document.getElementById("date");
 const form = document.getElementById("transaction-form");
 const title = document.getElementById("title");
 const amount = document.getElementById("amount");
 const type = document.getElementById("type");
 const category = document.getElementById("category");
+const date = document.getElementById("date");
 
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
 
-const toggle = document.getElementById("darkToggle");
 const search = document.getElementById("search");
+const toggle = document.getElementById("darkToggle");
+
 const chartCanvas = document.getElementById("expenseChart");
 
+// DATA
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let editId = null;
+let chart = null;
+
 // FILTER BUTTONS
-const filterButtons = document.querySelectorAll(".filter-btn");
-
-filterButtons.forEach((btn) => {
+document.querySelectorAll(".filter-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    filterButtons.forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll(".filter-btn")
+      .forEach(b => b.classList.remove("active"));
 
+    btn.classList.add("active");
     currentFilter = btn.dataset.filter;
+
     renderTransactions();
   });
 });
@@ -34,11 +40,7 @@ filterButtons.forEach((btn) => {
 if (toggle) {
   toggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-      "darkMode",
-      document.body.classList.contains("dark")
-    );
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   });
 }
 
@@ -46,46 +48,39 @@ if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
-// DATA
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let editId = null;
-let chart;
-
 // SAVE
-function saveTransactions() {
+function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
 // BALANCE
 function updateBalance() {
-  let total = 0;
-  let incomeTotal = 0;
-  let expenseTotal = 0;
+  let total = 0, inc = 0, exp = 0;
 
-  transactions.forEach((t) => {
+  transactions.forEach(t => {
     if (t.type === "income") {
       total += t.amount;
-      incomeTotal += t.amount;
+      inc += t.amount;
     } else {
       total -= t.amount;
-      expenseTotal += t.amount;
+      exp += t.amount;
     }
   });
 
   balance.textContent = `₦${total}`;
-  income.textContent = `₦${incomeTotal}`;
-  expense.textContent = `₦${expenseTotal}`;
+  income.textContent = `₦${inc}`;
+  expense.textContent = `₦${exp}`;
 }
 
 // CHART
 function renderChart() {
-  const incomeData = transactions
-    .filter((t) => t.type === "income")
-    .reduce((acc, t) => acc + t.amount, 0);
+  const inc = transactions
+    .filter(t => t.type === "income")
+    .reduce((a, b) => a + b.amount, 0);
 
-  const expenseData = transactions
-    .filter((t) => t.type === "expense")
-    .reduce((acc, t) => acc + t.amount, 0);
+  const exp = transactions
+    .filter(t => t.type === "expense")
+    .reduce((a, b) => a + b.amount, 0);
 
   if (chart) chart.destroy();
 
@@ -93,7 +88,7 @@ function renderChart() {
     type: "pie",
     data: {
       labels: ["Income", "Expense"],
-      datasets: [{ data: [incomeData, expenseData] }]
+      datasets: [{ data: [inc, exp] }]
     }
   });
 }
@@ -105,44 +100,37 @@ function renderTransactions() {
   let filtered = [...transactions].reverse();
 
   if (currentFilter !== "all") {
-    filtered = filtered.filter((t) => t.type === currentFilter);
+    filtered = filtered.filter(t => t.type === currentFilter);
   }
 
-  if (search) {
-    const searchValue = search.value.toLowerCase();
-    filtered = filtered.filter((t) =>
-      t.title.toLowerCase().includes(searchValue)
+  if (search?.value) {
+    const q = search.value.toLowerCase();
+    filtered = filtered.filter(t =>
+      t.title.toLowerCase().includes(q)
     );
   }
 
   if (filtered.length === 0) {
     list.innerHTML = `<p class="empty">No transactions found</p>`;
-    updateBalance();
-    renderChart();
-    updateMonthlyReport();
-    updateWeeklyReport();
-    return;
+  } else {
+    filtered.forEach(t => {
+      const li = document.createElement("li");
+      li.classList.add(t.type);
+
+      li.innerHTML = `
+        <span>
+          ${t.category} ${t.title} - ₦${t.amount}
+          <small>(${t.date})</small>
+        </span>
+        <div class="actions">
+          <button class="edit-btn" onclick="edit(${t.id})">Edit</button>
+          <button class="delete-btn" onclick="remove(${t.id})">X</button>
+        </div>
+      `;
+
+      list.appendChild(li);
+    });
   }
-
-  filtered.forEach((transaction) => {
-    const li = document.createElement("li");
-    li.classList.add(transaction.type);
-
-    li.innerHTML = `
-      <span>
-        ${transaction.category} ${transaction.title}
-        - ₦${transaction.amount}
-        <small>(${transaction.date})</small>
-      </span>
-
-      <div class="actions">
-        <button class="edit-btn" onclick="editTransaction(${transaction.id})">Edit</button>
-        <button class="delete-btn" onclick="deleteTransaction(${transaction.id})">X</button>
-      </div>
-    `;
-
-    list.appendChild(li);
-  });
 
   updateBalance();
   renderChart();
@@ -151,24 +139,23 @@ function renderTransactions() {
 }
 
 // DELETE
-function deleteTransaction(id) {
+function remove(id) {
   if (!confirm("Delete this transaction?")) return;
-
-  transactions = transactions.filter((t) => t.id !== id);
-  saveTransactions();
+  transactions = transactions.filter(t => t.id !== id);
+  save();
   renderTransactions();
 }
 
 // EDIT
-function editTransaction(id) {
-  const t = transactions.find((t) => t.id === id);
+function edit(id) {
+  const t = transactions.find(t => t.id === id);
   if (!t) return;
 
   title.value = t.title;
   amount.value = t.amount;
   type.value = t.type;
-  date.value = t.date;
   category.value = t.category;
+  date.value = t.date;
 
   editId = id;
   form.querySelector("button").textContent = "Update Transaction";
@@ -179,116 +166,98 @@ form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const amt = Number(amount.value);
-  if (!amt || amt <= 0) return alert("Enter valid amount");
+  if (!amt || amt <= 0) return alert("Invalid amount");
 
   const transaction = {
     id: editId ?? Date.now(),
     title: title.value || category.value,
     amount: amt,
     type: type.value,
-    date: date.value || new Date().toISOString().split("T")[0],
-    category: category.value
+    category: category.value,
+    date: date.value || new Date().toISOString().split("T")[0]
   };
 
   if (editId === null) {
     transactions.push(transaction);
   } else {
-    transactions = transactions.map((t) =>
+    transactions = transactions.map(t =>
       t.id === editId ? transaction : t
     );
     editId = null;
     form.querySelector("button").textContent = "Add Transaction";
   }
 
-  saveTransactions();
+  save();
   renderTransactions();
   form.reset();
 });
 
 // SEARCH
-if (search) {
-  search.addEventListener("input", renderTransactions);
-}
+search?.addEventListener("input", renderTransactions);
 
 // MONTHLY REPORT
 function updateMonthlyReport() {
   const now = new Date();
-  const month = now.getMonth();
-  const year = now.getFullYear();
 
-  const monthly = transactions.filter((t) => {
+  const monthly = transactions.filter(t => {
     const d = new Date(t.date);
-    return d.getMonth() === month && d.getFullYear() === year;
+    return d.getMonth() === now.getMonth() &&
+           d.getFullYear() === now.getFullYear();
   });
 
-  let incomeTotal = 0;
-  let expenseTotal = 0;
-  let biggestExpense = 0;
+  let inc = 0, exp = 0, big = 0;
 
-  monthly.forEach((t) => {
-    if (t.type === "income") {
-      incomeTotal += t.amount;
-    } else {
-      expenseTotal += t.amount;
-      if (t.amount > biggestExpense) biggestExpense = t.amount;
+  monthly.forEach(t => {
+    if (t.type === "income") inc += t.amount;
+    else {
+      exp += t.amount;
+      if (t.amount > big) big = t.amount;
     }
   });
 
-  const net = incomeTotal - expenseTotal;
+  const net = inc - exp;
 
-  const set = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = `₦${value}`;
-  };
-
-  set("m-income", incomeTotal);
-  set("m-expense", expenseTotal);
+  set("m-income", inc);
+  set("m-expense", exp);
   set("m-net", net);
   set("m-count", monthly.length);
-  set("m-biggest", biggestExpense);
+  set("m-biggest", big);
 }
 
-// WEEKLY REPORT (FIXED)
+// WEEKLY REPORT
 function updateWeeklyReport() {
   const now = new Date();
-  const start = new Date();
-  start.setDate(now.getDate() - 7);
 
-  const weekly = transactions.filter((t) => {
+  const weekly = transactions.filter(t => {
     const d = new Date(t.date);
-    return d >= start && d <= now;
+    const diff = (now - d) / (1000 * 60 * 60 * 24);
+    return diff <= 7;
   });
 
-  let incomeTotal = 0;
-  let expenseTotal = 0;
-  let biggestExpense = 0;
+  let inc = 0, exp = 0, big = 0;
 
-  weekly.forEach((t) => {
-    if (t.type === "income") {
-      incomeTotal += t.amount;
-    } else {
-      expenseTotal += t.amount;
-      if (t.amount > biggestExpense) biggestExpense = t.amount;
+  weekly.forEach(t => {
+    if (t.type === "income") inc += t.amount;
+    else {
+      exp += t.amount;
+      if (t.amount > big) big = t.amount;
     }
   });
 
-  const net = incomeTotal - expenseTotal;
+  const net = inc - exp;
 
-  const set = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = `₦${value}`;
-  };
-
-  set("w-income", incomeTotal);
-  set("w-expense", expenseTotal);
+  set("w-income", inc);
+  set("w-expense", exp);
   set("w-net", net);
   set("w-count", weekly.length);
-  set("w-biggest", biggestExpense);
+  set("w-biggest", big);
 }
 
-// INIT (IMPORTANT)
-renderTransactions();
-updateMonthlyReport();
-updateWeeklyReport();
+// HELPER
+function set(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = `₦${value}`;
+}
 
-form.querySelector("button").textContent = "Add Transaction";
+// INIT
+renderTransactions();
