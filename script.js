@@ -140,10 +140,34 @@ function renderChart() {
   if (chart) chart.destroy();
 
   chart = new Chart(chartCanvas, {
-    type: "pie",
+    type: "doughnut",
+
     data: {
       labels: ["Income", "Expense"],
-      datasets: [{ data: [inc, exp] }]
+      datasets: [{
+        data: [inc, exp],
+        backgroundColor: [
+          "#22c55e",
+          "#ef4444"
+        ],
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+
+    options: {
+      responsive: true,
+      cutout: "70%",
+
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            padding: 20,
+            usePointStyle: true
+          }
+        }
+      }
     }
   });
 }
