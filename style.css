@@ -25,6 +25,12 @@ h1{
   font-weight:bold;
   font-size:14px;
 }
+#budget-warning{
+  text-align:center;
+  margin-top:10px;
+  font-weight:bold;
+  font-size:14px;
+}
 /* BALANCE */
 .balance-box{
   text-align:center;
