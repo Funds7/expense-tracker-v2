@@ -47,11 +47,6 @@ body.dark #expenseChart{
   background:#2a2a2a;
 }
 
-body{
-  max-width:500px;
-  margin:auto;
-}
-
 .income-box{
   flex:1;
   padding:10px;
@@ -259,4 +254,32 @@ select{
     width:100%;
     justify-content:flex-end;
   }
+}
+.monthly-dashboard {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 12px;
+}
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dash-card {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body.dark .monthly-dashboard {
+  background: #1e1e1e;
+}
+
+body.dark .dash-card {
+  background: #2a2a2a;
 }
