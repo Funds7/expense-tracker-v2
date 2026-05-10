@@ -217,3 +217,12 @@ if (form) {
 
 // INIT
 renderTransactions();
+// ================= SPLASH SCREEN CONTROL =================
+window.addEventListener("load", () => {
+  setTimeout(() => {
+    const splash = document.getElementById("splash");
+    if (splash) {
+      splash.style.display = "none";
+    }
+  }, 2500);
+});
