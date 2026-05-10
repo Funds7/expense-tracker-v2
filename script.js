@@ -15,24 +15,17 @@ const expense = document.getElementById("expense");
 
 const toggle = document.getElementById("darkToggle");
 const search = document.getElementById("search");
-
-const chartCanvas =
-  document.getElementById("expenseChart");
+const chartCanvas = document.getElementById("expenseChart");
 
 // FILTER BUTTONS
-const filterButtons =
-  document.querySelectorAll(".filter-btn");
+const filterButtons = document.querySelectorAll(".filter-btn");
 
 filterButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
-    filterButtons.forEach((b) =>
-      b.classList.remove("active")
-    );
-
+    filterButtons.forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
 
     currentFilter = btn.dataset.filter;
-
     renderTransactions();
   });
 });
@@ -49,29 +42,18 @@ if (toggle) {
   });
 }
 
-// RESTORE DARK MODE
-if (
-  localStorage.getItem("darkMode") === "true"
-) {
+if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
 // DATA
-let transactions =
-  JSON.parse(
-    localStorage.getItem("transactions")
-  ) || [];
-
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let editId = null;
-
 let chart;
 
 // SAVE
 function saveTransactions() {
-  localStorage.setItem(
-    "transactions",
-    JSON.stringify(transactions)
-  );
+  localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
 // BALANCE
@@ -111,9 +93,7 @@ function renderChart() {
     type: "pie",
     data: {
       labels: ["Income", "Expense"],
-      datasets: [{
-        data: [incomeData, expenseData]
-      }]
+      datasets: [{ data: [incomeData, expenseData] }]
     }
   });
 }
@@ -125,40 +105,31 @@ function renderTransactions() {
   let filtered = [...transactions].reverse();
 
   if (currentFilter !== "all") {
-    filtered = filtered.filter(
-      (t) => t.type === currentFilter
-    );
+    filtered = filtered.filter((t) => t.type === currentFilter);
   }
 
   if (search) {
-    const searchValue =
-      search.value.toLowerCase();
-
+    const searchValue = search.value.toLowerCase();
     filtered = filtered.filter((t) =>
-      t.title
-        .toLowerCase()
-        .includes(searchValue)
+      t.title.toLowerCase().includes(searchValue)
     );
   }
 
   if (filtered.length === 0) {
-    list.innerHTML = `
-      <p class="empty">No transactions found</p>
-    `;
+    list.innerHTML = `<p class="empty">No transactions found</p>`;
     updateBalance();
     renderChart();
+    updateMonthlyReport();
     return;
   }
 
   filtered.forEach((transaction) => {
     const li = document.createElement("li");
-
     li.classList.add(transaction.type);
 
     li.innerHTML = `
       <span>
-        ${transaction.category}
-        ${transaction.title}
+        ${transaction.category} ${transaction.title}
         - ₦${transaction.amount}
         <small>(${transaction.date})</small>
       </span>
@@ -174,56 +145,46 @@ function renderTransactions() {
 
   updateBalance();
   renderChart();
+  updateMonthlyReport();
 }
 
 // DELETE
 function deleteTransaction(id) {
-  const confirmDelete = confirm("Delete this transaction?");
-  if (!confirmDelete) return;
+  if (!confirm("Delete this transaction?")) return;
 
-  transactions = transactions.filter(
-    (t) => t.id !== id
-  );
-
+  transactions = transactions.filter((t) => t.id !== id);
   saveTransactions();
   renderTransactions();
 }
 
 // EDIT
 function editTransaction(id) {
-  const transaction =
-    transactions.find((t) => t.id === id);
+  const t = transactions.find((t) => t.id === id);
+  if (!t) return;
 
-  if (!transaction) return;
-
-  title.value = transaction.title;
-  amount.value = transaction.amount;
-  type.value = transaction.type;
-  date.value = transaction.date;
-  category.value = transaction.category;
+  title.value = t.title;
+  amount.value = t.amount;
+  type.value = t.type;
+  date.value = t.date;
+  category.value = t.category;
 
   editId = id;
-
-  form.querySelector("button").textContent =
-    "Update Transaction";
+  form.querySelector("button").textContent = "Update Transaction";
 }
 
+// ADD / UPDATE
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
   const amt = Number(amount.value);
-
-  if (!amt || amt <= 0) {
-    alert("Enter valid amount");
-    return;
-  }
+  if (!amt || amt <= 0) return alert("Enter valid amount");
 
   const transaction = {
-    id: editId === null ? Date.now() : editId,
+    id: editId ?? Date.now(),
     title: title.value || category.value,
     amount: amt,
     type: type.value,
-    date: date.value || new Date().toLocaleDateString(),
+    date: date.value || new Date().toISOString().split("T")[0],
     category: category.value
   };
 
@@ -233,10 +194,8 @@ form.addEventListener("submit", (e) => {
     transactions = transactions.map((t) =>
       t.id === editId ? transaction : t
     );
-
     editId = null;
-    form.querySelector("button").textContent =
-      "Add Transaction";
+    form.querySelector("button").textContent = "Add Transaction";
   }
 
   saveTransactions();
@@ -249,8 +208,43 @@ if (search) {
   search.addEventListener("input", renderTransactions);
 }
 
+// MONTHLY REPORT
+function updateMonthlyReport() {
+  const now = new Date();
+  const month = now.getMonth();
+  const year = now.getFullYear();
+
+  const monthly = transactions.filter((t) => {
+    const d = new Date(t.date);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+
+  let incomeTotal = 0;
+  let expenseTotal = 0;
+  let biggestExpense = 0;
+
+  monthly.forEach((t) => {
+    if (t.type === "income") {
+      incomeTotal += t.amount;
+    } else {
+      expenseTotal += t.amount;
+      if (t.amount > biggestExpense) biggestExpense = t.amount;
+    }
+  });
+
+  const net = incomeTotal - expenseTotal;
+
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `₦${value}`;
+  };
+
+  set("m-income", incomeTotal);
+  set("m-expense", expenseTotal);
+  set("m-net", net);
+  set("m-count", monthly.length);
+  set("m-biggest", biggestExpense);
+}
+
 // INIT
 renderTransactions();
-
-form.querySelector("button").textContent =
-  "Add Transaction";
