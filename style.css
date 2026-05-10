@@ -3,6 +3,7 @@ body{
   background:#f4f4f4;
   margin:0;
   padding:20px;
+  transition:0.2s;
 }
 
 .container{
@@ -10,8 +11,9 @@ body{
   margin:auto;
   background:white;
   padding:20px;
-  border-radius:10px;
+  border-radius:15px;
   box-shadow:0 0 10px rgba(0,0,0,0.1);
+  transition:0.2s;
 }
 
 h1{
@@ -26,6 +28,8 @@ h1{
 
 #balance{
   color:green;
+  font-size:28px;
+  font-weight:bold;
 }
 
 /* SUMMARY */
@@ -36,6 +40,23 @@ h1{
   margin-top:20px;
 }
 
+.income-box{
+  padding:15px;
+  border-radius:10px;
+  color:white;
+  background:#1f9d55;
+  text-align:center;
+}
+
+.expense-box{
+  padding:15px;
+  border-radius:10px;
+  color:white;
+  background:#e3342f;
+  text-align:center;
+}
+
+/* CHART */
 #expenseChart{
   margin-top:20px;
   background:white;
@@ -43,31 +64,12 @@ h1{
   border-radius:15px;
 }
 
-body.dark #expenseChart{
-  background:#2a2a2a;
-}
-
-.income-box{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  color:white;
-  background:#1f9d55;
-}
-
-.expense-box{
-  flex:1;
-  padding:10px;
-  border-radius:10px;
-  color:white;
-  background:#e3342f;
-}
-
 /* FORM */
 form{
   display:flex;
   flex-direction:column;
   gap:10px;
+  margin-top:20px;
 }
 
 input,
@@ -75,71 +77,29 @@ select,
 button{
   padding:12px;
   border:1px solid #ccc;
-  border-radius:5px;
+  border-radius:8px;
   font-size:16px;
-}
-
-/* BUTTON */
-button{
-  background: linear-gradient(135deg, #000, #333);
-  color:white;
-  border:none;
-  cursor:pointer;
   transition:0.2s;
 }
 
+/* INPUT FOCUS */
+input:focus,
+select:focus{
+  outline:none;
+  border:1px solid #333;
+  box-shadow:0 0 5px rgba(0,0,0,0.2);
+}
+
+/* MAIN BUTTON */
+button{
+  background:linear-gradient(135deg,#000,#333);
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
 button:hover{
-  transform: scale(1.03);
-}
-
-/* LIST */
-ul{
-  list-style:none;
-  padding:0;
-  margin-top:20px;
-}
-
-li{
-  background:#eee;
-  padding:10px;
-  margin-bottom:10px;
-  border-radius:5px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  transition: 0.2s;
-}
-
-li:hover{
-  transform: translateY(-2px);
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
-}
-
-.expense{
-  border-right:5px solid red;
-}
-
-.income{
-  border-right:5px solid green;
-}
-
-/* DELETE */
-.delete-btn{
-  background:red;
-  color:white;
-  border:none;
-  padding:5px 10px;
-  border-radius:5px;
-}
-
-/* EDIT BUTTON (FIXED) */
-.edit-btn{
-  background:#333;
-  color:white;
-  margin-right:5px;
-  border:none;
-  padding:5px 10px;
-  border-radius:5px;
+  transform:scale(1.03);
 }
 
 /* FILTER */
@@ -157,7 +117,6 @@ li:hover{
   background:#eee;
   cursor:pointer;
   font-weight:bold;
-  transition:0.2s;
 }
 
 .filter-btn.active{
@@ -165,19 +124,6 @@ li:hover{
   color:white;
 }
 
-/* DARK MODE */
-body.dark {
-  background: #121212;
-  color: white;
-}
-
-body.dark .container {
-  background: #1e1e1e;
-}
-
-body.dark li {
-  background: #2a2a2a;
-}
 /* SEARCH */
 #search{
   width:100%;
@@ -186,25 +132,71 @@ body.dark li {
   box-sizing:border-box;
 }
 
-/* DARK MODE BUTTON */
+/* DARK TOGGLE */
 #darkToggle{
   width:100%;
   margin-bottom:15px;
   background:linear-gradient(135deg,#222,#444);
 }
 
+/* LIST */
+ul{
+  list-style:none;
+  padding:0;
+  margin-top:20px;
+}
+
+li{
+  background:#eee;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  transition:0.2s;
+}
+
+li:hover{
+  transform:translateY(-2px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* TRANSACTION TYPES */
+.expense{
+  border-right:5px solid red;
+}
+
+.income{
+  border-right:5px solid green;
+}
+
 /* ACTION BUTTONS */
 .actions{
   display:flex;
-  gap:5px;
+  gap:8px;
 }
 
 .actions button{
   padding:7px 12px;
   font-size:14px;
+  border:none;
+  border-radius:6px;
 }
 
-/* EMPTY STATE */
+/* EDIT */
+.actions button:first-child{
+  background:#333;
+  color:white;
+}
+
+/* DELETE */
+.actions button:last-child{
+  background:#e3342f;
+  color:white;
+}
+
+/* EMPTY */
 .empty{
   text-align:center;
   padding:20px;
@@ -212,21 +204,59 @@ body.dark li {
   font-weight:bold;
 }
 
-/* INPUT FOCUS */
-input:focus,
-select:focus{
-  outline:none;
-  border:1px solid #333;
-  box-shadow:0 0 5px rgba(0,0,0,0.2);
+/* MONTHLY DASHBOARD */
+.monthly-dashboard{
+  margin-top:20px;
+  padding:15px;
+  background:#f9f9f9;
+  border-radius:12px;
 }
 
-/* SMOOTHER UI */
-.container,
-li,
-button,
-input,
-select{
-  transition:all 0.2s ease;
+.dash-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.dash-card{
+  background:white;
+  padding:10px;
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* DARK MODE */
+body.dark{
+  background:#121212;
+  color:white;
+}
+
+body.dark .container{
+  background:#1e1e1e;
+}
+
+body.dark li{
+  background:#2a2a2a;
+}
+
+body.dark #expenseChart{
+  background:#2a2a2a;
+}
+
+body.dark .monthly-dashboard{
+  background:#1e1e1e;
+}
+
+body.dark .dash-card{
+  background:#2a2a2a;
+}
+
+body.dark input,
+body.dark select{
+  background:#2a2a2a;
+  color:white;
+  border:1px solid #444;
 }
 
 /* MOBILE */
@@ -254,32 +284,4 @@ select{
     width:100%;
     justify-content:flex-end;
   }
-}
-.monthly-dashboard {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f9f9f9;
-  border-radius: 12px;
-}
-
-.dash-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.dash-card {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-body.dark .monthly-dashboard {
-  background: #1e1e1e;
-}
-
-body.dark .dash-card {
-  background: #2a2a2a;
 }
