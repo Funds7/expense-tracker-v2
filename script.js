@@ -35,6 +35,7 @@ if (localStorage.getItem("darkMode") === "true") {
 
 // ================= BALANCE =================
 function updateBalance() {
+
   let inc = 0;
   let exp = 0;
 
@@ -43,9 +44,45 @@ function updateBalance() {
     else exp += t.amount;
   });
 
-  balance.textContent = `₦${inc - exp}`;
+  const total = inc - exp;
+
+  balance.textContent = `₦${total}`;
   income.textContent = `₦${inc}`;
   expense.textContent = `₦${exp}`;
+
+  const warning =
+    document.getElementById("budget-warning");
+
+  if (!warning) return;
+
+  // WARNING SYSTEM
+  if (exp > inc) {
+
+    warning.textContent =
+      "⚠️ Your expenses are higher than your income!";
+
+    warning.style.color = "red";
+
+    balance.style.color = "red";
+
+  } else if (exp > inc * 0.7) {
+
+    warning.textContent =
+      "⚠️ You are close to your spending limit.";
+
+    warning.style.color = "orange";
+
+    balance.style.color = "orange";
+
+  } else {
+
+    warning.textContent =
+      "✅ Budget is healthy.";
+
+    warning.style.color = "limegreen";
+
+    balance.style.color = "limegreen";
+  }
 }
 
 // ================= DELETE =================
