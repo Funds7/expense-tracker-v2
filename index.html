@@ -6,63 +6,73 @@
   <title>Expense Tracker - Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
-  
-  <body>
 
-  <div class="container">
+<body>
 
-    <h1>Expense Tracker</h1>
+<!-- ================= SPLASH SCREEN ================= -->
+<div id="splash">
+  <div class="splash-content">
+    <h1>💰 Expense Tracker</h1>
+    <p>Smart Finance App</p>
+    <div class="loader"></div>
+  </div>
+</div>
 
-    <p id="edit-status"></p>
+<!-- ================= APP CONTENT ================= -->
+<div class="container">
 
-    <button id="darkToggle">🌙 Dark Mode</button>
+  <h1>Expense Tracker</h1>
 
-    <!-- NAVIGATION -->
-    <nav class="nav">
-      <a href="index.html">🏠 Home</a>
-      <a href="add.html">➕ Add</a>
-      <a href="report.html">📊 Reports</a>
-    </nav>
+  <p id="edit-status"></p>
 
-    <!-- BALANCE -->
-    <div class="balance-box">
-      <h2>Balance</h2>
-      <h3 id="balance">₦0</h3>
-      <p id="budget-warning"></p>
-      
-      <div class="summary">
-        <div class="income-box">
-          <h4>Income</h4>
-          <p id="income">₦0</p>
-        </div>
+  <button id="darkToggle">🌙 Dark Mode</button>
 
-        <div class="expense-box">
-          <h4>Expense</h4>
-          <p id="expense">₦0</p>
-        </div>
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <a href="index.html">🏠 Home</a>
+    <a href="add.html">➕ Add</a>
+    <a href="report.html">📊 Reports</a>
+  </nav>
+
+  <!-- BALANCE -->
+  <div class="balance-box">
+    <h2>Balance</h2>
+    <h3 id="balance">₦0</h3>
+    <p id="budget-warning"></p>
+    
+    <div class="summary">
+      <div class="income-box">
+        <h4>Income</h4>
+        <p id="income">₦0</p>
+      </div>
+
+      <div class="expense-box">
+        <h4>Expense</h4>
+        <p id="expense">₦0</p>
       </div>
     </div>
-
-    <!-- SEARCH -->
-    <input type="text" id="search" placeholder="Search transaction..." />
-
-    <!-- FILTER -->
-    <div class="filter-box">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="income">Income</button>
-      <button class="filter-btn" data-filter="expense">Expense</button>
-    </div>
-
-    <!-- CHART -->
-    <canvas id="expenseChart"></canvas>
-
-    <!-- TRANSACTION LIST -->
-    <ul id="list"></ul>
-
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
+  <!-- SEARCH -->
+  <input type="text" id="search" placeholder="Search transaction..." />
+
+  <!-- FILTER -->
+  <div class="filter-box">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="income">Income</button>
+    <button class="filter-btn" data-filter="expense">Expense</button>
+  </div>
+
+  <!-- CHART -->
+  <canvas id="expenseChart"></canvas>
+
+  <!-- TRANSACTION LIST -->
+  <ul id="list"></ul>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
