@@ -7,7 +7,7 @@ function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// ================= ELEMENT CHECKS =================
+// ================= ELEMENTS =================
 const form = document.getElementById("transaction-form");
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
@@ -35,8 +35,6 @@ if (localStorage.getItem("darkMode") === "true") {
 
 // ================= BALANCE =================
 function updateBalance() {
-  if (!balance) return;
-
   let inc = 0;
   let exp = 0;
 
@@ -60,28 +58,24 @@ function deleteTransaction(id) {
 
 // ================= EDIT =================
 function editTransaction(id) {
-  const transaction = transactions.find(
-    t => t.id === id
-  );
+  const transaction = transactions.find(t => t.id === id);
 
   if (!transaction) return;
 
-  document.getElementById("title").value =
-    transaction.title;
-
-  document.getElementById("amount").value =
-    transaction.amount;
-
-  document.getElementById("type").value =
-    transaction.type;
-
-  document.getElementById("category").value =
-    transaction.category;
-
-  document.getElementById("date").value =
-    transaction.date;
+  document.getElementById("title").value = transaction.title;
+  document.getElementById("amount").value = transaction.amount;
+  document.getElementById("type").value = transaction.type;
+  document.getElementById("category").value = transaction.category;
+  document.getElementById("date").value = transaction.date;
 
   editId = id;
+
+  // EDIT STATUS UI
+  const status = document.getElementById("edit-status");
+  if (status) {
+    status.textContent = "✏️ Editing transaction...";
+    status.style.color = "orange";
+  }
 
   window.scrollTo({
     top: 0,
@@ -89,11 +83,17 @@ function editTransaction(id) {
   });
 }
 
-// ================= RENDER LIST =================
+// ================= RENDER =================
 function renderTransactions() {
-  if (!list) return;
-
   list.innerHTML = "";
+
+  if (transactions.length === 0) {
+    list.innerHTML = `<p class="empty">No transactions yet</p>`;
+    updateBalance();
+    renderChart();
+    updateReports();
+    return;
+  }
 
   transactions.slice().reverse().forEach(t => {
     const li = document.createElement("li");
@@ -106,13 +106,8 @@ function renderTransactions() {
       </div>
 
       <div class="actions">
-        <button onclick="editTransaction(${t.id})">
-          Edit
-        </button>
-
-        <button onclick="deleteTransaction(${t.id})">
-          X
-        </button>
+        <button onclick="editTransaction(${t.id})">Edit</button>
+        <button onclick="deleteTransaction(${t.id})">X</button>
       </div>
     `;
 
@@ -140,15 +135,9 @@ function renderChart() {
 
   chart = new Chart(chartCanvas, {
     type: "pie",
-
     data: {
       labels: ["Income", "Expense"],
-
-      datasets: [
-        {
-          data: [inc, exp]
-        }
-      ]
+      datasets: [{ data: [inc, exp] }]
     }
   });
 }
@@ -157,7 +146,6 @@ function renderChart() {
 function updateReports() {
   const set = (id, val) => {
     const el = document.getElementById(id);
-
     if (el) el.textContent = `₦${val}`;
   };
 
@@ -165,23 +153,19 @@ function updateReports() {
 
   const monthly = transactions.filter(t => {
     const d = new Date(t.date + "T00:00:00");
-
-    return d.getMonth() === now.getMonth();
+    return (
+      d.getMonth() === now.getMonth() &&
+      d.getFullYear() === now.getFullYear()
+    );
   });
 
   const weekly = transactions.filter(t => {
     const d = new Date(t.date + "T00:00:00");
-
-    const diff =
-      (now - d) / (1000 * 60 * 60 * 24);
-
+    const diff = (now - d) / (1000 * 60 * 60 * 24);
     return diff >= 0 && diff <= 7;
   });
 
-  let mInc = 0;
-  let mExp = 0;
-  let wInc = 0;
-  let wExp = 0;
+  let mInc = 0, mExp = 0, wInc = 0, wExp = 0;
 
   monthly.forEach(t => {
     if (t.type === "income") mInc += t.amount;
@@ -206,25 +190,14 @@ function updateReports() {
 
 // ================= FORM =================
 if (form) {
-
   form.addEventListener("submit", e => {
-
     e.preventDefault();
 
-    const title =
-      document.getElementById("title");
-
-    const amount =
-      document.getElementById("amount");
-
-    const type =
-      document.getElementById("type");
-
-    const category =
-      document.getElementById("category");
-
-    const date =
-      document.getElementById("date");
+    const title = document.getElementById("title");
+    const amount = document.getElementById("amount");
+    const type = document.getElementById("type");
+    const category = document.getElementById("category");
+    const date = document.getElementById("date");
 
     const transactionData = {
       id: editId || Date.now(),
@@ -235,28 +208,25 @@ if (form) {
       date: date.value
     };
 
-    // EDIT MODE
     if (editId) {
-
       transactions = transactions.map(t =>
         t.id === editId ? transactionData : t
       );
 
       editId = null;
 
-    } else {
+      const status = document.getElementById("edit-status");
+      if (status) status.textContent = "";
 
-      // ADD MODE
+    } else {
       transactions.push(transactionData);
     }
 
     save();
-
     form.reset();
-
     renderTransactions();
   });
-
 }
+
 // ================= INIT =================
 renderTransactions();
