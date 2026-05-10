@@ -2,12 +2,12 @@ let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let chart = null;
 let editId = null;
 
-// SAVE
+/* ================= SAVE ================= */
 function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// ELEMENTS
+/* ================= ELEMENTS ================= */
 const form = document.getElementById("transaction-form");
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
@@ -17,7 +17,7 @@ const chartCanvas = document.getElementById("expenseChart");
 const submitBtn = document.getElementById("submit-btn");
 const status = document.getElementById("edit-status");
 
-// DARK MODE
+/* ================= DARK MODE ================= */
 const toggle = document.getElementById("darkToggle");
 
 if (toggle) {
@@ -31,8 +31,10 @@ if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
-// BALANCE + WARNING
+/* ================= BALANCE ================= */
 function updateBalance() {
+  if (!balance || !income || !expense) return;
+
   let inc = 0, exp = 0;
 
   transactions.forEach(t => {
@@ -59,35 +61,40 @@ function updateBalance() {
   }
 }
 
-// DELETE
+/* ================= DELETE ================= */
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
   save();
   renderTransactions();
 }
 
-// EDIT FIX (IMPORTANT)
+/* ================= EDIT ================= */
 function editTransaction(id) {
   const t = transactions.find(x => x.id === id);
   if (!t) return;
 
-  document.getElementById("title").value = t.title;
-  document.getElementById("amount").value = t.amount;
-  document.getElementById("type").value = t.type;
-  document.getElementById("category").value = t.category;
-  document.getElementById("date").value = t.date;
+  const titleEl = document.getElementById("title");
+  const amountEl = document.getElementById("amount");
+  const typeEl = document.getElementById("type");
+  const categoryEl = document.getElementById("category");
+  const dateEl = document.getElementById("date");
+
+  if (titleEl) titleEl.value = t.title;
+  if (amountEl) amountEl.value = t.amount;
+  if (typeEl) typeEl.value = t.type;
+  if (categoryEl) categoryEl.value = t.category;
+  if (dateEl) dateEl.value = t.date;
 
   editId = id;
 
-  submitBtn.textContent = "Update Transaction";
-
-  if (status) {
-    status.textContent = "✏️ Editing mode active";
-  }
+  if (submitBtn) submitBtn.textContent = "Update Transaction";
+  if (status) status.textContent = "✏️ Editing mode active";
 }
 
-// RENDER
+/* ================= RENDER ================= */
 function renderTransactions() {
+  if (!list) return;
+
   list.innerHTML = "";
 
   if (transactions.length === 0) {
@@ -96,7 +103,6 @@ function renderTransactions() {
 
   transactions.slice().reverse().forEach(t => {
     const li = document.createElement("li");
-
     li.className = t.type;
 
     li.innerHTML = `
@@ -119,12 +125,17 @@ function renderTransactions() {
   updateReports();
 }
 
-// CHART
+/* ================= CHART ================= */
 function renderChart() {
   if (!chartCanvas) return;
 
-  const inc = transactions.filter(t => t.type === "income").reduce((a, b) => a + b.amount, 0);
-  const exp = transactions.filter(t => t.type === "expense").reduce((a, b) => a + b.amount, 0);
+  const inc = transactions
+    .filter(t => t.type === "income")
+    .reduce((a, b) => a + b.amount, 0);
+
+  const exp = transactions
+    .filter(t => t.type === "expense")
+    .reduce((a, b) => a + b.amount, 0);
 
   if (chart) chart.destroy();
 
@@ -137,7 +148,7 @@ function renderChart() {
   });
 }
 
-// REPORT FIX (IMPORTANT FIX)
+/* ================= REPORTS ================= */
 function updateReports() {
   const now = new Date();
 
@@ -181,7 +192,7 @@ function updateReports() {
   set("w-count", weekly.length);
 }
 
-// FORM (FIXED EDIT FLOW)
+/* ================= FORM ================= */
 if (form) {
   form.addEventListener("submit", e => {
     e.preventDefault();
@@ -202,8 +213,7 @@ if (form) {
 
       editId = null;
 
-      submitBtn.textContent = "Add Transaction";
-
+      if (submitBtn) submitBtn.textContent = "Add Transaction";
       if (status) status.textContent = "";
     } else {
       transactions.push(data);
@@ -215,18 +225,18 @@ if (form) {
   });
 }
 
-// INIT
+/* ================= INIT ================= */
 renderTransactions();
-// ================= SPLASH SCREEN CONTROL =================
+
+/* ================= SPLASH ================= */
 window.addEventListener("load", () => {
   setTimeout(() => {
     const splash = document.getElementById("splash");
-    if (splash) {
-      splash.style.display = "none";
-    }
+    if (splash) splash.style.display = "none";
   }, 2500);
 });
-// ================= PWA SERVICE WORKER =================
+
+/* ================= SERVICE WORKER ================= */
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
