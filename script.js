@@ -120,6 +120,7 @@ function renderTransactions() {
     updateBalance();
     renderChart();
     updateMonthlyReport();
+    updateWeeklyReport();
     return;
   }
 
@@ -146,6 +147,7 @@ function renderTransactions() {
   updateBalance();
   renderChart();
   updateMonthlyReport();
+  updateWeeklyReport();
 }
 
 // DELETE
@@ -246,5 +248,47 @@ function updateMonthlyReport() {
   set("m-biggest", biggestExpense);
 }
 
-// INIT
+// WEEKLY REPORT (FIXED)
+function updateWeeklyReport() {
+  const now = new Date();
+  const start = new Date();
+  start.setDate(now.getDate() - 7);
+
+  const weekly = transactions.filter((t) => {
+    const d = new Date(t.date);
+    return d >= start && d <= now;
+  });
+
+  let incomeTotal = 0;
+  let expenseTotal = 0;
+  let biggestExpense = 0;
+
+  weekly.forEach((t) => {
+    if (t.type === "income") {
+      incomeTotal += t.amount;
+    } else {
+      expenseTotal += t.amount;
+      if (t.amount > biggestExpense) biggestExpense = t.amount;
+    }
+  });
+
+  const net = incomeTotal - expenseTotal;
+
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `₦${value}`;
+  };
+
+  set("w-income", incomeTotal);
+  set("w-expense", expenseTotal);
+  set("w-net", net);
+  set("w-count", weekly.length);
+  set("w-biggest", biggestExpense);
+}
+
+// INIT (IMPORTANT)
 renderTransactions();
+updateMonthlyReport();
+updateWeeklyReport();
+
+form.querySelector("button").textContent = "Add Transaction";
