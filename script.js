@@ -2,30 +2,28 @@ let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let chart = null;
 let editId = null;
 
-// ================= SAVE =================
+// SAVE
 function save() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 }
 
-// ================= ELEMENTS =================
+// ELEMENTS
 const form = document.getElementById("transaction-form");
 const list = document.getElementById("list");
 const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
 const chartCanvas = document.getElementById("expenseChart");
+const submitBtn = document.getElementById("submit-btn");
+const status = document.getElementById("edit-status");
 
-// ================= DARK MODE =================
+// DARK MODE
 const toggle = document.getElementById("darkToggle");
 
 if (toggle) {
   toggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-      "darkMode",
-      document.body.classList.contains("dark")
-    );
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   });
 }
 
@@ -33,113 +31,78 @@ if (localStorage.getItem("darkMode") === "true") {
   document.body.classList.add("dark");
 }
 
-// ================= BALANCE =================
+// BALANCE + WARNING
 function updateBalance() {
-
-  let inc = 0;
-  let exp = 0;
+  let inc = 0, exp = 0;
 
   transactions.forEach(t => {
     if (t.type === "income") inc += t.amount;
     else exp += t.amount;
   });
 
-  const total = inc - exp;
-
-  balance.textContent = `₦${total}`;
+  balance.textContent = `₦${inc - exp}`;
   income.textContent = `₦${inc}`;
   expense.textContent = `₦${exp}`;
 
-  const warning =
-    document.getElementById("budget-warning");
-
+  const warning = document.getElementById("budget-warning");
   if (!warning) return;
 
-  // WARNING SYSTEM
   if (exp > inc) {
-
-    warning.textContent =
-      "⚠️ Your expenses are higher than your income!";
-
+    warning.textContent = "⚠️ Overspending!";
     warning.style.color = "red";
-
-    balance.style.color = "red";
-
   } else if (exp > inc * 0.7) {
-
-    warning.textContent =
-      "⚠️ You are close to your spending limit.";
-
+    warning.textContent = "⚠️ Near limit";
     warning.style.color = "orange";
-
-    balance.style.color = "orange";
-
   } else {
-
-    warning.textContent =
-      "✅ Budget is healthy.";
-
+    warning.textContent = "✅ Healthy budget";
     warning.style.color = "limegreen";
-
-    balance.style.color = "limegreen";
   }
 }
 
-// ================= DELETE =================
+// DELETE
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
-
   save();
   renderTransactions();
 }
 
-// ================= EDIT =================
+// EDIT FIX (IMPORTANT)
 function editTransaction(id) {
-  const transaction = transactions.find(t => t.id === id);
+  const t = transactions.find(x => x.id === id);
+  if (!t) return;
 
-  if (!transaction) return;
-
-  document.getElementById("title").value = transaction.title;
-  document.getElementById("amount").value = transaction.amount;
-  document.getElementById("type").value = transaction.type;
-  document.getElementById("category").value = transaction.category;
-  document.getElementById("date").value = transaction.date;
+  document.getElementById("title").value = t.title;
+  document.getElementById("amount").value = t.amount;
+  document.getElementById("type").value = t.type;
+  document.getElementById("category").value = t.category;
+  document.getElementById("date").value = t.date;
 
   editId = id;
 
-  // EDIT STATUS UI
-  const status = document.getElementById("edit-status");
-  if (status) {
-    status.textContent = "✏️ Editing transaction...";
-    status.style.color = "orange";
-  }
+  submitBtn.textContent = "Update Transaction";
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  if (status) {
+    status.textContent = "✏️ Editing mode active";
+  }
 }
 
-// ================= RENDER =================
+// RENDER
 function renderTransactions() {
   list.innerHTML = "";
 
   if (transactions.length === 0) {
     list.innerHTML = `<p class="empty">No transactions yet</p>`;
-    updateBalance();
-    renderChart();
-    updateReports();
-    return;
   }
 
   transactions.slice().reverse().forEach(t => {
     const li = document.createElement("li");
 
+    li.className = t.type;
+
     li.innerHTML = `
       <div>
-        ${t.category} ${t.title} - ₦${t.amount}
-        <br>
-        <small>${t.date}</small>
+        <b>${t.category}</b> ${t.title} - ₦${t.amount}
+        <br><small>${t.date}</small>
       </div>
 
       <div class="actions">
@@ -156,17 +119,12 @@ function renderTransactions() {
   updateReports();
 }
 
-// ================= CHART =================
+// CHART
 function renderChart() {
   if (!chartCanvas) return;
 
-  const inc = transactions
-    .filter(t => t.type === "income")
-    .reduce((a, b) => a + b.amount, 0);
-
-  const exp = transactions
-    .filter(t => t.type === "expense")
-    .reduce((a, b) => a + b.amount, 0);
+  const inc = transactions.filter(t => t.type === "income").reduce((a, b) => a + b.amount, 0);
+  const exp = transactions.filter(t => t.type === "expense").reduce((a, b) => a + b.amount, 0);
 
   if (chart) chart.destroy();
 
@@ -179,27 +137,20 @@ function renderChart() {
   });
 }
 
-// ================= REPORTS =================
+// REPORT FIX (IMPORTANT FIX)
 function updateReports() {
-  const set = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = `₦${val}`;
-  };
-
   const now = new Date();
 
   const monthly = transactions.filter(t => {
-    const d = new Date(t.date + "T00:00:00");
-    return (
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
-    );
+    const d = new Date(t.date);
+    return d.getMonth() === now.getMonth() &&
+           d.getFullYear() === now.getFullYear();
   });
 
   const weekly = transactions.filter(t => {
-    const d = new Date(t.date + "T00:00:00");
+    const d = new Date(t.date);
     const diff = (now - d) / (1000 * 60 * 60 * 24);
-    return diff >= 0 && diff <= 7;
+    return diff <= 7;
   });
 
   let mInc = 0, mExp = 0, wInc = 0, wExp = 0;
@@ -214,6 +165,11 @@ function updateReports() {
     else wExp += t.amount;
   });
 
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = `₦${val}`;
+  };
+
   set("m-income", mInc);
   set("m-expense", mExp);
   set("m-net", mInc - mExp);
@@ -225,38 +181,32 @@ function updateReports() {
   set("w-count", weekly.length);
 }
 
-// ================= FORM =================
+// FORM (FIXED EDIT FLOW)
 if (form) {
   form.addEventListener("submit", e => {
     e.preventDefault();
 
-    const title = document.getElementById("title");
-    const amount = document.getElementById("amount");
-    const type = document.getElementById("type");
-    const category = document.getElementById("category");
-    const date = document.getElementById("date");
-
-    const transactionData = {
+    const data = {
       id: editId || Date.now(),
-      title: title.value.trim(),
-      amount: Number(amount.value),
-      type: type.value,
-      category: category.value,
-      date: date.value
+      title: document.getElementById("title").value,
+      amount: Number(document.getElementById("amount").value),
+      type: document.getElementById("type").value,
+      category: document.getElementById("category").value,
+      date: document.getElementById("date").value
     };
 
     if (editId) {
       transactions = transactions.map(t =>
-        t.id === editId ? transactionData : t
+        t.id === editId ? data : t
       );
 
       editId = null;
 
-      const status = document.getElementById("edit-status");
-      if (status) status.textContent = "";
+      submitBtn.textContent = "Add Transaction";
 
+      if (status) status.textContent = "";
     } else {
-      transactions.push(transactionData);
+      transactions.push(data);
     }
 
     save();
@@ -265,5 +215,5 @@ if (form) {
   });
 }
 
-// ================= INIT =================
+// INIT
 renderTransactions();
