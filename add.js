@@ -1,39 +1,50 @@
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+document.getElementById("transaction-form").addEventListener("submit", function (e) {
+  e.preventDefault();
 
-const form = document.getElementById("transaction-form");
-const titleInput = document.getElementById("title");
-const amountInput = document.getElementById("amount");
-const typeInput = document.getElementById("type");
-const categoryInput = document.getElementById("category");
-const dateInput = document.getElementById("date");
+  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+  let editId = localStorage.getItem("editId");
 
-if (dateInput) {
-  dateInput.value = new Date().toISOString().split("T")[0];
-}
+  const title = document.getElementById("title").value;
+  const amount = parseFloat(document.getElementById("amount").value);
+  const category = document.getElementById("category").value;
+  const date = document.getElementById("date").value;
+  const type = document.getElementById("type").value;
 
-function save() {
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-}
+  if (editId) {
+    // EDIT MODE
+    transactions = transactions.map(t => {
+      if (t.id == editId) {
+        return {
+          ...t,
+          title,
+          amount,
+          category,
+          date,
+          type
+        };
+      }
+      return t;
+    });
 
-if (form) {
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
+    localStorage.removeItem("editId");
+    alert("Transaction updated successfully ✏️");
 
-    const data = {
+  } else {
+    // ADD MODE
+    transactions.push({
       id: Date.now(),
-      title: titleInput.value,
-      amount: Number(amountInput.value),
-      type: typeInput.value,
-      category: categoryInput.value,
-      date: dateInput.value
-    };
+      title,
+      amount,
+      category,
+      date,
+      type
+    });
 
-    transactions.push(data);
-    save();
+    alert("Transaction added successfully ✅");
+  }
 
-    form.reset();
-    dateInput.value = new Date().toISOString().split("T")[0];
+  localStorage.setItem("transactions", JSON.stringify(transactions));
 
-    alert("Transaction saved!");
-  });
-}
+  this.reset();
+  window.location.href = "index.html";
+});
