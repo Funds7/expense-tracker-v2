@@ -37,4 +37,3 @@ if (form) {
     alert("Transaction saved!");
   });
 }
-<script src="add.js"></script>
