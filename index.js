@@ -42,4 +42,3 @@ function init() {
 }
 
 init();
-<script src="index.js"></script>
