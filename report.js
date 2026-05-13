@@ -50,4 +50,3 @@ function updateReports() {
 }
 
 document.addEventListener("DOMContentLoaded", updateReports);
-<script src="report.js"></script>
