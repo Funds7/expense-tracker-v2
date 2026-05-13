@@ -25,6 +25,7 @@ function updateDashboard() {
 
 /* ================= RENDER LIST ================= */
 function renderList() {
+function renderList() {
   if (!list) return;
 
   list.innerHTML = "";
@@ -40,15 +41,14 @@ function renderList() {
       </div>
 
       <div style="margin-top:5px;">
-        <button onclick="editTransaction(${t.id})">✏️ Edit</button>
-        <button onclick="deleteTransaction(${t.id})">🗑️ Delete</button>
+        <button class="edit-btn" data-id="${t.id}">✏️ Edit</button>
+        <button class="delete-btn" data-id="${t.id}">🗑️ Delete</button>
       </div>
     `;
 
     list.appendChild(li);
   });
 }
-
 /* ================= EDIT ================= */
 function editTransaction(id) {
   localStorage.setItem("editId", id);
