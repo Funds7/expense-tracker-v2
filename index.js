@@ -25,7 +25,6 @@ function updateDashboard() {
 
 /* ================= RENDER LIST ================= */
 function renderList() {
-function renderList() {
   if (!list) return;
 
   list.innerHTML = "";
@@ -49,21 +48,26 @@ function renderList() {
     list.appendChild(li);
   });
 }
-/* ================= EDIT ================= */
-function editTransaction(id) {
-  localStorage.setItem("editId", id);
-  window.location.href = "add.html";
-}
 
-/* IMPORTANT: make function clickable from HTML */
-window.editTransaction = editTransaction;
+/* ================= EVENT LISTENERS ================= */
+document.addEventListener("click", function (e) {
+  const editBtn = e.target.closest(".edit-btn");
+  const deleteBtn = e.target.closest(".delete-btn");
 
-/* ================= DELETE ================= */
-function deleteTransaction(id) {
-  transactions = transactions.filter(t => t.id !== id);
-  localStorage.setItem("transactions", JSON.stringify(transactions));
-  refresh();
-}
+  if (editBtn) {
+    const id = Number(editBtn.dataset.id);
+    localStorage.setItem("editId", id);
+    window.location.href = "add.html";
+  }
+
+  if (deleteBtn) {
+    const id = Number(deleteBtn.dataset.id);
+
+    transactions = transactions.filter(t => t.id !== id);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    refresh();
+  }
+});
 
 /* ================= REFRESH ================= */
 function refresh() {
