@@ -34,11 +34,7 @@ const toggle = document.getElementById("darkToggle");
 if (toggle) {
   toggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
-
-    localStorage.setItem(
-      "darkMode",
-      document.body.classList.contains("dark")
-    );
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   });
 }
 
@@ -54,39 +50,18 @@ function updateBalance() {
   let exp = 0;
 
   transactions.forEach(t => {
-    if (t.type === "income") {
-      inc += t.amount;
-    } else {
-      exp += t.amount;
-    }
+    if (t.type === "income") inc += t.amount;
+    else exp += t.amount;
   });
 
   balance.textContent = `₦${inc - exp}`;
   income.textContent = `₦${inc}`;
   expense.textContent = `₦${exp}`;
-
-  const warning = document.getElementById("budget-warning");
-
-  if (!warning) return;
-
-  if (exp > inc) {
-    warning.textContent = "⚠️ Overspending!";
-    warning.style.color = "red";
-
-  } else if (exp > inc * 0.7) {
-    warning.textContent = "⚠️ Near limit";
-    warning.style.color = "orange";
-
-  } else {
-    warning.textContent = "✅ Healthy budget";
-    warning.style.color = "limegreen";
-  }
 }
 
 /* ================= DELETE ================= */
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
-
   save();
   renderTransactions();
 }
@@ -94,7 +69,6 @@ function deleteTransaction(id) {
 /* ================= EDIT ================= */
 function editTransaction(id) {
   const t = transactions.find(x => x.id === id);
-
   if (!t) return;
 
   titleInput.value = t.title;
@@ -105,18 +79,10 @@ function editTransaction(id) {
 
   editId = id;
 
-  if (submitBtn) {
-    submitBtn.textContent = "Update Transaction";
-  }
+  if (submitBtn) submitBtn.textContent = "Update Transaction";
+  if (status) status.textContent = "✏️ Editing mode active";
 
-  if (status) {
-    status.textContent = "✏️ Editing mode active";
-  }
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ================= RENDER ================= */
@@ -126,40 +92,28 @@ function renderTransactions() {
   list.innerHTML = "";
 
   if (transactions.length === 0) {
-    list.innerHTML = `
-      <p class="empty">No transactions yet</p>
-    `;
+    list.innerHTML = `<p class="empty">No transactions yet</p>`;
   }
 
-  transactions
-    .slice()
-    .reverse()
-    .forEach(t => {
+  transactions.slice().reverse().forEach(t => {
+    const li = document.createElement("li");
+    li.className = t.type;
 
-      const li = document.createElement("li");
+    li.innerHTML = `
+      <div>
+        <b>${t.category}</b> ${t.title} - ₦${t.amount}
+        <br>
+        <small>${t.date}</small>
+      </div>
 
-      li.className = t.type;
+      <div class="actions">
+        <button onclick="editTransaction(${t.id})">Edit</button>
+        <button onclick="deleteTransaction(${t.id})">X</button>
+      </div>
+    `;
 
-      li.innerHTML = `
-        <div>
-          <b>${t.category}</b> ${t.title} - ₦${t.amount}
-          <br>
-          <small>${t.date}</small>
-        </div>
-
-        <div class="actions">
-          <button onclick="editTransaction(${t.id})">
-            Edit
-          </button>
-
-          <button onclick="deleteTransaction(${t.id})">
-            X
-          </button>
-        </div>
-      `;
-
-      list.appendChild(li);
-    });
+    list.appendChild(li);
+  });
 
   updateBalance();
   renderChart();
@@ -170,72 +124,46 @@ function renderTransactions() {
 function renderChart() {
   if (!chartCanvas) return;
 
-  const inc = transactions
-    .filter(t => t.type === "income")
-    .reduce((a, b) => a + b.amount, 0);
+  const inc = transactions.filter(t => t.type === "income").reduce((a, b) => a + b.amount, 0);
+  const exp = transactions.filter(t => t.type === "expense").reduce((a, b) => a + b.amount, 0);
 
-  const exp = transactions
-    .filter(t => t.type === "expense")
-    .reduce((a, b) => a + b.amount, 0);
-
-  if (chart) {
-    chart.destroy();
-  }
+  if (chart) chart.destroy();
 
   chart = new Chart(chartCanvas, {
     type: "doughnut",
-
     data: {
       labels: ["Income", "Expense"],
-
       datasets: [{
         data: [inc, exp],
-
-        backgroundColor: [
-          "#22c55e",
-          "#ef4444"
-        ],
-
-        borderWidth: 0,
-        hoverOffset: 8
+        backgroundColor: ["#22c55e", "#ef4444"],
+        borderWidth: 0
       }]
     },
-
     options: {
       responsive: true,
       cutout: "70%",
-
       plugins: {
-        legend: {
-          position: "bottom",
-
-          labels: {
-            padding: 20,
-            usePointStyle: true
-          }
-        }
+        legend: { position: "bottom" }
       }
     }
   });
 }
 
-/* ================= REPORTS ================= */
+/* ================= REPORTS (FIXED CORE) ================= */
 function updateReports() {
-  const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+  const data = JSON.parse(localStorage.getItem("transactions")) || [];
 
   const now = new Date();
 
-  const monthly = transactions.filter(t => {
+  const monthly = data.filter(t => {
     const d = new Date(t.date);
     if (isNaN(d)) return false;
 
-    return (
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
-    );
+    return d.getMonth() === now.getMonth() &&
+           d.getFullYear() === now.getFullYear();
   });
 
-  const weekly = transactions.filter(t => {
+  const weekly = data.filter(t => {
     const d = new Date(t.date);
     if (isNaN(d)) return false;
 
@@ -273,112 +201,46 @@ function updateReports() {
 
 /* ================= FORM ================= */
 if (form) {
-
   form.addEventListener("submit", e => {
-
     e.preventDefault();
 
     const data = {
       id: editId || Date.now(),
-
       title: titleInput.value,
-
       amount: Number(amountInput.value),
-
       type: typeInput.value,
-
       category: categoryInput.value,
-
       date: dateInput.value
     };
 
-    /* ===== UPDATE ===== */
     if (editId) {
-
       transactions = transactions.map(t =>
         t.id === editId ? data : t
       );
-
       editId = null;
-
-      if (submitBtn) {
-        submitBtn.textContent = "Add Transaction";
-      }
-
-      if (status) {
-        status.textContent = "✅ Transaction updated";
-      }
-
+      if (submitBtn) submitBtn.textContent = "Add Transaction";
     } else {
-
-      /* ===== ADD ===== */
       transactions.push(data);
-
-      if (status) {
-        status.textContent = "✅ Transaction added";
-      }
     }
 
     save();
-
     renderTransactions();
 
     form.reset();
-
-    /* restore date */
     if (dateInput) {
-      dateInput.value =
-        new Date().toISOString().split("T")[0];
+      dateInput.value = new Date().toISOString().split("T")[0];
     }
-
   });
-
 }
 
-/* ================= GLOBAL FUNCTIONS ================= */
+/* ================= GLOBAL ================= */
 window.editTransaction = editTransaction;
 window.deleteTransaction = deleteTransaction;
 
 /* ================= INIT ================= */
 renderTransactions();
 
-/* ================= SPLASH ================= */
-window.addEventListener("load", () => {
-
-  setTimeout(() => {
-
-    const splash =
-      document.getElementById("splash");
-
-    if (splash) {
-      splash.style.display = "none";
-    }
-
-  }, 2500);
-});
-
-/* ================= SERVICE WORKER ================= */
-if ("serviceWorker" in navigator) {
-
-  window.addEventListener("load", () => {
-
-    navigator.serviceWorker
-      .register("sw.js")
-
-      .then(() => {
-        console.log("Service Worker Registered");
-      })
-
-      .catch(err => {
-        console.log("Service Worker Error:", err);
-      });
-
-  });
-}
-window.addEventListener("load", () => {
-  if (document.getElementById("m-income")) {
-    setTimeout(() => {
-      updateReports();
-    }, 100);
-  }
+/* ================= SAFE AUTO REPORT LOAD ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  updateReports();
 });
