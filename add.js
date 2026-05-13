@@ -44,5 +44,27 @@ document.getElementById("transaction-form").addEventListener("submit", function 
   localStorage.setItem("transactions", JSON.stringify(transactions));
 
   this.reset();
-  window.location.href = "index.html";
+
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 300);
+});
+
+/* ================= AUTO FILL WHEN EDITING ================= */
+window.addEventListener("load", function () {
+  const editId = Number(localStorage.getItem("editId"));
+
+  if (!editId) return;
+
+  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+  const transaction = transactions.find(t => t.id === editId);
+
+  if (!transaction) return;
+
+  document.getElementById("title").value = transaction.title;
+  document.getElementById("amount").value = transaction.amount;
+  document.getElementById("category").value = transaction.category;
+  document.getElementById("date").value = transaction.date;
+  document.getElementById("type").value = transaction.type;
 });
