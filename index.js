@@ -5,13 +5,17 @@ const balance = document.getElementById("balance");
 const income = document.getElementById("income");
 const expense = document.getElementById("expense");
 
+/* ================= DASHBOARD ================= */
 function updateDashboard() {
   let inc = 0;
   let exp = 0;
 
   transactions.forEach(t => {
-    if (t.type === "income") inc += t.amount;
-    else exp += t.amount;
+    if (t.type === "income") {
+      inc += Number(t.amount);
+    } else {
+      exp += Number(t.amount);
+    }
   });
 
   if (balance) balance.textContent = `₦${inc - exp}`;
@@ -19,6 +23,7 @@ function updateDashboard() {
   if (expense) expense.textContent = `₦${exp}`;
 }
 
+/* ================= RENDER LIST ================= */
 function renderList() {
   if (!list) return;
 
@@ -28,17 +33,41 @@ function renderList() {
     const li = document.createElement("li");
 
     li.innerHTML = `
-      <b>${t.category}</b> ${t.title} - ₦${t.amount}
-      <small>${t.date}</small>
+      <div>
+        <b>${t.category}</b> ${t.title} - ₦${t.amount}
+        <br>
+        <small>${t.date}</small>
+      </div>
+
+      <div style="margin-top:5px;">
+        <button onclick="editTransaction(${t.id})">✏️ Edit</button>
+        <button onclick="deleteTransaction(${t.id})">🗑️ Delete</button>
+      </div>
     `;
 
     list.appendChild(li);
   });
 }
 
-function init() {
+/* ================= EDIT ================= */
+function editTransaction(id) {
+  localStorage.setItem("editId", id);
+  window.location.href = "add.html";
+}
+
+/* ================= DELETE ================= */
+function deleteTransaction(id) {
+  transactions = transactions.filter(t => t.id !== id);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+
+  refresh();
+}
+
+/* ================= REFRESH ================= */
+function refresh() {
   updateDashboard();
   renderList();
 }
 
-init();
+/* ================= INIT ================= */
+refresh();
