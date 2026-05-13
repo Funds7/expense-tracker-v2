@@ -55,11 +55,13 @@ function editTransaction(id) {
   window.location.href = "add.html";
 }
 
+/* IMPORTANT: make function clickable from HTML */
+window.editTransaction = editTransaction;
+
 /* ================= DELETE ================= */
 function deleteTransaction(id) {
   transactions = transactions.filter(t => t.id !== id);
   localStorage.setItem("transactions", JSON.stringify(transactions));
-
   refresh();
 }
 
