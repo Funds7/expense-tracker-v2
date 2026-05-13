@@ -375,6 +375,10 @@ if ("serviceWorker" in navigator) {
 
   });
 }
-window.addEventListener("DOMContentLoaded", () => {
-  updateReports();
+window.addEventListener("load", () => {
+  if (document.getElementById("m-income")) {
+    setTimeout(() => {
+      updateReports();
+    }, 100);
+  }
 });
