@@ -336,9 +336,13 @@ if (form) {
     form.reset();
 
     /* restore date */
-    dateInput.value =
-      new Date().toISOString().split("T")[0];
+    if (dateInput) {
+      dateInput.value =
+        new Date().toISOString().split("T")[0];
+    }
+
   });
+
 }
 
 /* ================= GLOBAL FUNCTIONS ================= */
@@ -374,3 +378,10 @@ if ("serviceWorker" in navigator) {
       .then(() => {
         console.log("Service Worker Registered");
       })
+
+      .catch(err => {
+        console.log("Service Worker Error:", err);
+      });
+
+  });
+}
