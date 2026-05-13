@@ -2,7 +2,7 @@ document.getElementById("transaction-form").addEventListener("submit", function 
   e.preventDefault();
 
   let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  let editId = localStorage.getItem("editId");
+  let editId = Number(localStorage.getItem("editId"));
 
   const title = document.getElementById("title").value;
   const amount = parseFloat(document.getElementById("amount").value);
@@ -11,9 +11,8 @@ document.getElementById("transaction-form").addEventListener("submit", function 
   const type = document.getElementById("type").value;
 
   if (editId) {
-    // EDIT MODE
     transactions = transactions.map(t => {
-      if (t.id == editId) {
+      if (t.id === editId) {
         return {
           ...t,
           title,
@@ -30,7 +29,6 @@ document.getElementById("transaction-form").addEventListener("submit", function 
     alert("Transaction updated successfully ✏️");
 
   } else {
-    // ADD MODE
     transactions.push({
       id: Date.now(),
       title,
