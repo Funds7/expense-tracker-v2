@@ -463,3 +463,18 @@ body.dark .premium-card{
     max-height:200px !important;
   }
 }
+.report-card button{
+  margin-top:10px;
+  width:100%;
+}
+
+.report-card input{
+  width:100%;
+  margin-top:10px;
+}
+
+#budgetStatus{
+  margin-top:10px;
+  font-size:14px;
+  font-weight:600;
+}
