@@ -132,4 +132,12 @@ function refresh() {
 /* ================= INIT ================= */
 document.addEventListener("DOMContentLoaded", () => {
   refresh();
+
+  // hide splash screen after loading
+  const splash = document.getElementById("splash");
+  if (splash) {
+    setTimeout(() => {
+      splash.style.display = "none";
+    }, 1500);
+  }
 });
