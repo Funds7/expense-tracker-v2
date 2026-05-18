@@ -1,64 +1,54 @@
-console.log("SETTINGS JS LOADED");
-const themeToggle = document.getElementById("themeToggle");
+document.addEventListener("DOMContentLoaded", () => {
 
-if (themeToggle) {
-  if (localStorage.getItem("darkMode") === "true") {
-    document.body.classList.add("dark");
+  console.log("SETTINGS JS LOADED");
+
+  const themeToggle = document.getElementById("themeToggle");
+
+  if (themeToggle) {
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+    }
+
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    });
   }
 
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
+  const budgetInput = document.getElementById("budgetInput");
+  const saveBudget = document.getElementById("saveBudget");
+  const budgetStatus = document.getElementById("budgetStatus");
 
-    const isDark = document.body.classList.contains("dark");
-    localStorage.setItem("darkMode", isDark);
-  });
-}
+  const savedBudget = localStorage.getItem("monthlyBudget");
 
-/* ================= BUDGET ================= */
+  if (budgetInput && savedBudget) {
+    budgetInput.value = savedBudget;
+  }
 
-const budgetInput = document.getElementById("budgetInput");
-const saveBudget = document.getElementById("saveBudget");
-const budgetStatus = document.getElementById("budgetStatus");
+  if (saveBudget) {
+    saveBudget.addEventListener("click", () => {
+      const value = budgetInput?.value;
 
-const savedBudget = localStorage.getItem("monthlyBudget");
+      if (!value) {
+        if (budgetStatus) budgetStatus.textContent = "Enter a valid amount";
+        return;
+      }
 
-if (budgetInput && savedBudget) {
-  budgetInput.value = savedBudget;
-}
+      localStorage.setItem("monthlyBudget", value);
+      if (budgetStatus) budgetStatus.textContent = `Budget saved: ₦${value}`;
+    });
+  }
 
-if (saveBudget) {
-  saveBudget.addEventListener("click", () => {
-    const value = budgetInput?.value;
+  const clearDataBtn = document.getElementById("clearDataBtn");
 
-    if (!value) {
-      if (budgetStatus) budgetStatus.textContent = "Enter a valid amount";
-      return;
-    }
+  if (clearDataBtn) {
+    clearDataBtn.addEventListener("click", () => {
+      if (!confirm("Are you sure?")) return;
 
-    localStorage.setItem("monthlyBudget", value);
+      localStorage.removeItem("transactions");
+      alert("All transactions deleted");
+      window.location.href = "index.html";
+    });
+  }
 
-    if (budgetStatus) {
-      budgetStatus.textContent = `Budget saved: ₦${value}`;
-    }
-  });
-}
-
-/* ================= CLEAR DATA ================= */
-
-const clearDataBtn = document.getElementById("clearDataBtn");
-
-if (clearDataBtn) {
-  clearDataBtn.addEventListener("click", () => {
-    const confirmDelete = confirm(
-      "Are you sure you want to delete all transactions?"
-    );
-
-    if (!confirmDelete) return;
-
-    localStorage.removeItem("transactions");
-
-    alert("All transactions deleted");
-
-    window.location.href = "index.html";
-  });
-}
+});
