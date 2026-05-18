@@ -1,3 +1,4 @@
+console.log("SETTINGS JS LOADED");
 const themeToggle = document.getElementById("themeToggle");
 
 if (themeToggle) {
