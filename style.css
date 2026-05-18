@@ -34,7 +34,45 @@ h1{
   font-weight:600;
   font-size:13px;
 }
+#budget-warning {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s ease;
+}
 
+/* WARNING (orange glow) */
+#budget-warning.warning {
+  background: rgba(255, 165, 0, 0.15);
+  color: orange;
+  border: 1px solid orange;
+  box-shadow: 0 0 10px orange;
+  animation: pulseWarning 1.5s infinite;
+}
+
+/* DANGER (red glow) */
+#budget-warning.danger {
+  background: rgba(255, 0, 0, 0.15);
+  color: red;
+  border: 1px solid red;
+  box-shadow: 0 0 15px red;
+  animation: pulseDanger 1s infinite;
+}
+
+/* ANIMATIONS */
+@keyframes pulseWarning {
+  0% { box-shadow: 0 0 5px orange; }
+  50% { box-shadow: 0 0 20px orange; }
+  100% { box-shadow: 0 0 5px orange; }
+}
+
+@keyframes pulseDanger {
+  0% { box-shadow: 0 0 5px red; }
+  50% { box-shadow: 0 0 25px red; }
+  100% { box-shadow: 0 0 5px red; }
+}
 /* ================= BALANCE CARD ================= */
 .balance-box{
   text-align:center;
