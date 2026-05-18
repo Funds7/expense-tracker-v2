@@ -23,8 +23,25 @@ function updateDashboard() {
   if (balance) balance.textContent = `₦${inc - exp}`;
   if (income) income.textContent = `₦${inc}`;
   if (expense) expense.textContent = `₦${exp}`;
-}
 
+  /* ================= BUDGET WARNING ================= */
+  const budget = Number(localStorage.getItem("monthlyBudget")) || 0;
+  const warningBox = document.getElementById("budget-warning");
+
+  if (warningBox && budget > 0) {
+    if (exp >= budget) {
+      warningBox.textContent = "⚠️ Budget exceeded!";
+      warningBox.style.color = "red";
+    } 
+    else if (exp >= budget * 0.8) {
+      warningBox.textContent = "⚠️ You are close to your budget limit!";
+      warningBox.style.color = "orange";
+    } 
+    else {
+      warningBox.textContent = "";
+    }
+  }
+}
 /* ================= CHART ================= */
 function updateChart() {
   let incomeTotal = 0;
