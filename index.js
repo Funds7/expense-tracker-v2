@@ -29,19 +29,22 @@ function updateDashboard() {
   const warningBox = document.getElementById("budget-warning");
 
   if (warningBox && budget > 0) {
+    warningBox.classList.remove("warning", "danger");
+
     if (exp >= budget) {
-      warningBox.textContent = "⚠️ Budget exceeded!";
-      warningBox.style.color = "red";
+      warningBox.textContent = "🚨 Budget Exceeded!";
+      warningBox.classList.add("danger");
     } 
     else if (exp >= budget * 0.8) {
-      warningBox.textContent = "⚠️ You are close to your budget limit!";
-      warningBox.style.color = "orange";
+      warningBox.textContent = "⚠️ You are close to your budget limit";
+      warningBox.classList.add("warning");
     } 
     else {
       warningBox.textContent = "";
     }
   }
-}
+} // ✅ THIS CLOSING BRACE WAS MISSING
+
 /* ================= CHART ================= */
 function updateChart() {
   let incomeTotal = 0;
