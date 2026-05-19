@@ -1,10 +1,15 @@
-const CACHE_NAME = "kuditrack-v1";
+const CACHE_NAME = "expense-tracker-v1";
 
 const urlsToCache = [
   "./",
   "./index.html",
+  "./add.html",
+  "./reports.html",
   "./style.css",
-  "./script.js"
+  "./script.js",
+  "./add.js",
+  "./reports.js",
+  "./app.js"
 ];
 
 self.addEventListener("install", event => {
