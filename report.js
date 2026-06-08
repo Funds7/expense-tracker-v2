@@ -1,82 +1,74 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-function updateReports() {
+function getMonth(t) {
+  const d = new Date(t.date);
   const now = new Date();
+  if (isNaN(d)) return false;
+  return d.getMonth() === now.getMonth() &&
+         d.getFullYear() === now.getFullYear();
+}
 
-  let monthly = [];
-  let weekly = [];
+function updateReports() {
 
-  transactions.forEach(t => {
-    const d = new Date(t.date);
-    if (isNaN(d)) return;
+  const monthly = transactions.filter(getMonth);
 
-    // MONTH FILTER
-    if (
-      d.getMonth() === now.getMonth() &&
-      d.getFullYear() === now.getFullYear()
-    ) {
-      monthly.push(t);
-    }
+  let income = 0;
+  let expense = 0;
 
-    // WEEK FILTER
-    const diff = (now - d) / (1000 * 60 * 60 * 24);
-    if (diff <= 7) {
-      weekly.push(t);
-    }
-  });
+  let categoryMap = {};
 
-  let mInc = 0, mExp = 0;
-  let wInc = 0, wExp = 0;
-
-  let mExpenses = [];
-  let wExpenses = [];
-
-  // MONTHLY CALC
   monthly.forEach(t => {
     let amt = Number(t.amount);
 
     if (t.type === "income") {
-      mInc += amt;
+      income += amt;
     } else {
-      mExp += amt;
-      mExpenses.push(amt);
+      expense += amt;
+
+      // CATEGORY TRACKING
+      if (!categoryMap[t.category]) {
+        categoryMap[t.category] = 0;
+      }
+      categoryMap[t.category] += amt;
     }
   });
 
-  // WEEKLY CALC
-  weekly.forEach(t => {
-    let amt = Number(t.amount);
+  // FIND TOP CATEGORY
+  let topCategory = "";
+  let max = 0;
 
-    if (t.type === "income") {
-      wInc += amt;
-    } else {
-      wExp += amt;
-      wExpenses.push(amt);
+  for (let key in categoryMap) {
+    if (categoryMap[key] > max) {
+      max = categoryMap[key];
+      topCategory = key;
     }
-  });
+  }
 
-  // BIGGEST EXPENSE
-  const biggestM = mExpenses.length ? Math.max(...mExpenses) : 0;
-  const biggestW = wExpenses.length ? Math.max(...wExpenses) : 0;
-
+  // UPDATE UI
   const set = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = `₦${val}`;
   };
 
-  // MONTHLY UI
-  set("m-income", mInc);
-  set("m-expense", mExp);
-  set("m-net", mInc - mExp);
+  set("m-income", income);
+  set("m-expense", expense);
+  set("m-net", income - expense);
   set("m-count", monthly.length);
-  set("m-biggest", biggestM);
 
-  // WEEKLY UI
-  set("w-income", wInc);
-  set("w-expense", wExp);
-  set("w-net", wInc - wExp);
-  set("w-count", weekly.length);
-  set("w-biggest", biggestW);
+  // INSIGHTS (IMPORTANT)
+  const insightBox = document.getElementById("insight");
+
+  if (insightBox) {
+    if (monthly.length === 0) {
+      insightBox.textContent = "No data yet to analyze 📊";
+    } else {
+      insightBox.textContent =
+        `You spend most on ${topCategory || "various categories"} 💡`;
+    }
+  }
+
+  // CATEGORY BREAKDOWN (if you add later UI)
+  console.log("Category Data:", categoryMap);
 }
 
 document.addEventListener("DOMContentLoaded", updateReports);
