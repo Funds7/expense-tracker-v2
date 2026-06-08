@@ -3,50 +3,80 @@ let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 function updateReports() {
   const now = new Date();
 
-  const monthly = transactions.filter(t => {
-    const d = new Date(t.date);
-    if (isNaN(d)) return false;
+  let monthly = [];
+  let weekly = [];
 
-    return (
+  transactions.forEach(t => {
+    const d = new Date(t.date);
+    if (isNaN(d)) return;
+
+    // MONTH FILTER
+    if (
       d.getMonth() === now.getMonth() &&
       d.getFullYear() === now.getFullYear()
-    );
-  });
+    ) {
+      monthly.push(t);
+    }
 
-  const weekly = transactions.filter(t => {
-    const d = new Date(t.date);
-    if (isNaN(d)) return false;
-
+    // WEEK FILTER
     const diff = (now - d) / (1000 * 60 * 60 * 24);
-    return diff <= 7;
+    if (diff <= 7) {
+      weekly.push(t);
+    }
   });
 
-  let mInc = 0, mExp = 0, wInc = 0, wExp = 0;
+  let mInc = 0, mExp = 0;
+  let wInc = 0, wExp = 0;
 
+  let mExpenses = [];
+  let wExpenses = [];
+
+  // MONTHLY CALC
   monthly.forEach(t => {
-    if (t.type === "income") mInc += t.amount;
-    else mExp += t.amount;
+    let amt = Number(t.amount);
+
+    if (t.type === "income") {
+      mInc += amt;
+    } else {
+      mExp += amt;
+      mExpenses.push(amt);
+    }
   });
 
+  // WEEKLY CALC
   weekly.forEach(t => {
-    if (t.type === "income") wInc += t.amount;
-    else wExp += t.amount;
+    let amt = Number(t.amount);
+
+    if (t.type === "income") {
+      wInc += amt;
+    } else {
+      wExp += amt;
+      wExpenses.push(amt);
+    }
   });
+
+  // BIGGEST EXPENSE
+  const biggestM = mExpenses.length ? Math.max(...mExpenses) : 0;
+  const biggestW = wExpenses.length ? Math.max(...wExpenses) : 0;
 
   const set = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = `₦${val}`;
   };
 
+  // MONTHLY UI
   set("m-income", mInc);
   set("m-expense", mExp);
   set("m-net", mInc - mExp);
   set("m-count", monthly.length);
+  set("m-biggest", biggestM);
 
+  // WEEKLY UI
   set("w-income", wInc);
   set("w-expense", wExp);
   set("w-net", wInc - wExp);
   set("w-count", weekly.length);
+  set("w-biggest", biggestW);
 }
 
 document.addEventListener("DOMContentLoaded", updateReports);
