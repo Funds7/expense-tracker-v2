@@ -5,19 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Reports</title>
   <link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b1020">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b1020">
+
+  <!-- 📊 PDF LIBRARY (ADDED) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
+
 <body>
 
   <div class="container">
 
     <!-- NAVIGATION -->
     <nav class="nav">
-  <a href="index.html">🏠 Home</a>
-  <a href="add.html">➕ Add</a>
-  <a href="report.html">📊 Reports</a>
-  <a href="settings.html">⚙️ Settings</a>
+      <a href="index.html">🏠 Home</a>
+      <a href="add.html">➕ Add</a>
+      <a href="report.html">📊 Reports</a>
+      <a href="settings.html">⚙️ Settings</a>
     </nav>
 
     <h1>Reports Dashboard</h1>
@@ -86,10 +90,67 @@
       </div>
     </div>
 
+    <!-- 📤 PDF EXPORT (ADDED - DO NOT REMOVE ANYTHING ABOVE) -->
+    <div class="monthly-dashboard">
+      <h2>📤 Export Report</h2>
+
+      <div class="dash-card">
+        <p>Download your financial report as PDF</p>
+
+        <button id="exportPDF" style="
+          width:100%;
+          padding:12px;
+          background:#1e88e5;
+          color:white;
+          border:none;
+          border-radius:6px;
+          font-size:16px;
+          margin-top:10px;
+        ">
+          Download PDF Report
+        </button>
+
+      </div>
+    </div>
+
   </div>
 
   <!-- ONLY REPORT LOGIC -->
   <script src="report.js"></script>
-<script src="app.js"></script>
+
+  <!-- 📊 PDF EXPORT LOGIC (ADDED) -->
+  <script>
+    document.getElementById("exportPDF")?.addEventListener("click", () => {
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+      let income = 0;
+      let expense = 0;
+
+      transactions.forEach(t => {
+        if (t.type === "income") income += Number(t.amount);
+        else expense += Number(t.amount);
+      });
+
+      let net = income - expense;
+
+      doc.setFontSize(16);
+      doc.text("Expense Tracker Report", 10, 10);
+
+      doc.setFontSize(12);
+      doc.text("Total Income: ₦" + income, 10, 30);
+      doc.text("Total Expense: ₦" + expense, 10, 40);
+      doc.text("Net Balance: ₦" + net, 10, 50);
+      doc.text("Total Transactions: " + transactions.length, 10, 60);
+
+      doc.save("expense-report.pdf");
+    });
+  </script>
+
+  <script src="app.js"></script>
+
 </body>
 </html>
