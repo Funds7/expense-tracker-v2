@@ -23,14 +23,15 @@ function isThisWeek(t) {
 
 function updateReports() {
 
-  // FILTERS
   const monthly = transactions.filter(isThisMonth);
   const weekly = transactions.filter(isThisWeek);
 
-  // MONTHLY CALC
   let mIncome = 0, mExpense = 0;
+  let wIncome = 0, wExpense = 0;
+
   let categoryMap = {};
 
+  // MONTHLY
   monthly.forEach(t => {
     let amt = Number(t.amount);
 
@@ -46,9 +47,7 @@ function updateReports() {
     }
   });
 
-  // WEEKLY CALC (FIXED)
-  let wIncome = 0, wExpense = 0;
-
+  // WEEKLY
   weekly.forEach(t => {
     let amt = Number(t.amount);
 
@@ -70,7 +69,6 @@ function updateReports() {
     }
   }
 
-  // SAFE SET FUNCTION
   const set = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = `₦${val}`;
@@ -83,7 +81,7 @@ function updateReports() {
   set("m-count", monthly.length);
   set("m-biggest", max);
 
-  // WEEKLY UI (NOW FIXED)
+  // WEEKLY UI
   set("w-income", wIncome);
   set("w-expense", wExpense);
   set("w-net", wIncome - wExpense);
@@ -101,3 +99,53 @@ function updateReports() {
 }
 
 document.addEventListener("DOMContentLoaded", updateReports);
+
+
+
+// ================================
+// 📤 PDF EXPORT (PRO FEATURE)
+// ================================
+document.addEventListener("DOMContentLoaded", () => {
+
+  const btn = document.getElementById("exportPDF");
+
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+
+    // 🔒 PRO CHECK
+    const isPro = localStorage.getItem("pro") === "true";
+
+    if (!isPro) {
+      alert("Upgrade to PRO to export PDF reports 💰");
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    let income = 0;
+    let expense = 0;
+
+    transactions.forEach(t => {
+      if (t.type === "income") income += Number(t.amount);
+      else expense += Number(t.amount);
+    });
+
+    let net = income - expense;
+
+    // PDF CONTENT
+    doc.setFontSize(16);
+    doc.text("Expense Tracker Report", 10, 10);
+
+    doc.setFontSize(12);
+    doc.text("Total Income: ₦" + income, 10, 30);
+    doc.text("Total Expense: ₦" + expense, 10, 40);
+    doc.text("Net Balance: ₦" + net, 10, 50);
+    doc.text("Transactions: " + transactions.length, 10, 60);
+
+    doc.save("finance-report.pdf");
+  });
+});
