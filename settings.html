@@ -4,10 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Settings</title>
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0b1020">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b1020">
+
+  <!-- 💳 PAYSTACK (FOR PRO UPGRADE) -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
 </head>
+
 <body>
 
 <div class="container">
@@ -22,59 +27,97 @@
     <a href="settings.html">⚙️ Settings</a>
   </nav>
 
-  <!-- SETTINGS CARD -->
+  <!-- PRO STATUS -->
   <div class="report-card">
+    <h3>💎 Account Status</h3>
+    <p id="proStatus">Checking...</p>
+  </div>
 
-    <h3>🌙 Dark Mode</h3>
+  <!-- UPGRADE TO PRO -->
+  <div class="report-card">
+    <h3>💰 Upgrade to PRO</h3>
+    <p>Unlock PDF export, AI insights & premium features</p>
 
-    <button id="themeToggle">
-      Toggle Theme
+    <button id="payBtn" style="
+      width:100%;
+      padding:12px;
+      background:#1e88e5;
+      color:white;
+      border:none;
+      border-radius:6px;
+      font-size:16px;
+      margin-top:10px;
+    ">
+      Unlock PRO (₦1000)
     </button>
+  </div>
 
+  <!-- DARK MODE -->
+  <div class="report-card">
+    <h3>🌙 Dark Mode</h3>
+    <button id="themeToggle">Toggle Theme</button>
   </div>
 
   <!-- BUDGET -->
   <div class="report-card">
-
     <h3>💰 Monthly Budget</h3>
 
-    <input
-      type="number"
-      id="budgetInput"
-      placeholder="Enter budget"
-    />
-
-    <button id="saveBudget">
-      Save Budget
-    </button>
+    <input type="number" id="budgetInput" placeholder="Enter budget" />
+    <button id="saveBudget">Save Budget</button>
 
     <p id="budgetStatus"></p>
-
   </div>
 
   <!-- CLEAR DATA -->
   <div class="report-card">
-
     <h3>🧹 Clear All Data</h3>
 
     <button id="clearDataBtn" style="background:#dc2626;">
       Delete Everything
     </button>
+  </div>
 
+  <!-- AI STATUS -->
+  <div class="report-card">
+    <h3>🤖 AI Status</h3>
+    <p>AI Finance Advisor: <b>Active</b></p>
   </div>
 
   <!-- APP INFO -->
   <div class="report-card">
-
     <h3>📱 App Version</h3>
-
-    <p>Expense Tracker v1.0</p>
-
+    <p>Expense Tracker v2.0 (Fintech Edition)</p>
   </div>
 
 </div>
 
 <script src="settings.js"></script>
 <script src="app.js"></script>
+
+<!-- ================= PRO PAYMENT LOGIC ================= -->
+<script>
+document.getElementById("payBtn")?.addEventListener("click", function () {
+
+  let handler = PaystackPop.setup({
+    key: "YOUR_PUBLIC_KEY_HERE",
+    email: "user@example.com",
+    amount: 100000, // ₦1000
+    currency: "NGN",
+
+    callback: function(response) {
+      localStorage.setItem("pro", "true");
+      document.getElementById("proStatus").textContent = "💎 PRO ACTIVE";
+      alert("🎉 Upgrade Successful! PRO unlocked");
+    },
+
+    onClose: function() {
+      alert("Payment cancelled");
+    }
+  });
+
+  handler.openIframe();
+});
+</script>
+
 </body>
 </html>
