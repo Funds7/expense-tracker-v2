@@ -2,27 +2,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("SETTINGS JS LOADED");
 
+  // =========================
+  // 🌙 DARK MODE
+  // =========================
   const themeToggle = document.getElementById("themeToggle");
 
-  // 🌙 DARK MODE (IMPROVED)
   if (themeToggle) {
     const isDark = localStorage.getItem("darkMode") === "true";
-
-    if (isDark) {
-      document.body.classList.add("dark");
-    }
+    document.body.classList.toggle("dark", isDark);
 
     themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark");
-
-      localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark")
-      );
+      const newState = !document.body.classList.contains("dark");
+      document.body.classList.toggle("dark", newState);
+      localStorage.setItem("darkMode", newState);
     });
   }
 
-  // 💰 BUDGET SYSTEM (SAFE FIX)
+  // =========================
+  // 💰 BUDGET SYSTEM
+  // =========================
   const budgetInput = document.getElementById("budgetInput");
   const saveBudget = document.getElementById("saveBudget");
   const budgetStatus = document.getElementById("budgetStatus");
@@ -47,10 +45,36 @@ document.addEventListener("DOMContentLoaded", () => {
       if (budgetStatus) {
         budgetStatus.textContent = `Budget saved: ₦${value}`;
       }
+
+      checkBudgetWarning(); // run check after saving
     });
   }
 
-  // 🧹 CLEAR DATA (SAFE VERSION)
+  // =========================
+  // 🚨 BUDGET WARNING CHECK
+  // =========================
+  function checkBudgetWarning() {
+    const budget = Number(localStorage.getItem("monthlyBudget") || 0);
+    const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+    let expense = 0;
+
+    transactions.forEach(t => {
+      if (t.type === "expense") {
+        expense += Number(t.amount);
+      }
+    });
+
+    if (budget > 0 && expense > budget) {
+      alert("🚨 You exceeded your monthly budget!");
+    }
+  }
+
+  checkBudgetWarning();
+
+  // =========================
+  // 🧹 CLEAR DATA
+  // =========================
   const clearDataBtn = document.getElementById("clearDataBtn");
 
   if (clearDataBtn) {
@@ -60,11 +84,22 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!confirmDelete) return;
 
       localStorage.removeItem("transactions");
-
       alert("All data cleared successfully");
 
       window.location.href = "index.html";
     });
+  }
+
+  // =========================
+  // 💎 PRO STATUS DISPLAY
+  // =========================
+  const proStatus = document.getElementById("proStatus");
+
+  if (proStatus) {
+    const isPro = localStorage.getItem("pro") === "true";
+    proStatus.textContent = isPro
+      ? "💎 PRO ACTIVE"
+      : "Free Plan (Upgrade Available)";
   }
 
 });
