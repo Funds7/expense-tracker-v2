@@ -1,5 +1,6 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
+// ================= DATE FILTERS =================
 function isThisMonth(t) {
   const d = new Date(t.date);
   const now = new Date();
@@ -16,14 +17,15 @@ function isThisWeek(t) {
   const now = new Date();
   const diff = (now - d) / (1000 * 60 * 60 * 24);
 
-  return diff <= 7;
+  return diff >= 0 && diff <= 7;
 }
 
 // ================= AI ENGINE =================
-function generateAIInsight(monthly, weekly, categoryMap) {
+function generateAIInsight(monthly, weekly, categoryMap, mExpense, budget) {
 
   let insights = [];
 
+  // TOP CATEGORY
   let topCategory = "";
   let max = 0;
 
@@ -35,14 +37,10 @@ function generateAIInsight(monthly, weekly, categoryMap) {
   }
 
   if (topCategory) {
-    insights.push(`You spend most on ${topCategory}`);
+    insights.push(`You spend most on ${topCategory} 📊`);
   }
 
-  let mExpense = 0;
-  monthly.forEach(t => {
-    if (t.type === "expense") mExpense += Number(t.amount);
-  });
-
+  // SPENDING TREND
   let wExpense = 0;
   weekly.forEach(t => {
     if (t.type === "expense") wExpense += Number(t.amount);
@@ -54,18 +52,22 @@ function generateAIInsight(monthly, weekly, categoryMap) {
     insights.push("Your spending is stable 💰");
   }
 
+  // SAVINGS CHECK
   let income = 0;
-  let expense = 0;
 
   monthly.forEach(t => {
     if (t.type === "income") income += Number(t.amount);
-    else expense += Number(t.amount);
   });
 
-  if (income > expense) {
+  if (income > mExpense) {
     insights.push("Good job! You are saving money 💰");
   } else {
-    insights.push("Warning: Spending more than income ⚠️");
+    insights.push("Warning: You are spending more than you earn ⚠️");
+  }
+
+  // BUDGET CHECK
+  if (budget && mExpense > budget) {
+    insights.push("You exceeded your monthly budget 🚨");
   }
 
   return insights.join(" | ");
@@ -81,6 +83,9 @@ function updateReports() {
   let wIncome = 0, wExpense = 0;
   let categoryMap = {};
 
+  let biggestExpense = 0;
+
+  // MONTHLY
   monthly.forEach(t => {
     let amt = Number(t.amount);
 
@@ -89,6 +94,10 @@ function updateReports() {
     } else {
       mExpense += amt;
 
+      if (amt > biggestExpense) {
+        biggestExpense = amt;
+      }
+
       if (!categoryMap[t.category]) {
         categoryMap[t.category] = 0;
       }
@@ -96,6 +105,7 @@ function updateReports() {
     }
   });
 
+  // WEEKLY
   weekly.forEach(t => {
     let amt = Number(t.amount);
 
@@ -106,16 +116,7 @@ function updateReports() {
     }
   });
 
-  let max = 0;
-  let topCategory = "";
-
-  for (let key in categoryMap) {
-    if (categoryMap[key] > max) {
-      max = categoryMap[key];
-      topCategory = key;
-    }
-  }
-
+  // SAFE UI SET
   const set = (id, val) => {
     const el = document.getElementById(id);
     if (el) el.textContent = `₦${val}`;
@@ -125,7 +126,7 @@ function updateReports() {
   set("m-expense", mExpense);
   set("m-net", mIncome - mExpense);
   set("m-count", monthly.length);
-  set("m-biggest", max);
+  set("m-biggest", biggestExpense);
 
   set("w-income", wIncome);
   set("w-expense", wExpense);
@@ -133,18 +134,35 @@ function updateReports() {
   set("w-count", weekly.length);
   set("w-biggest", wExpense);
 
-  // AI OUTPUT FIXED
+  // ================= AI OUTPUT =================
   const ai = document.getElementById("ai-insight");
+  const budget = Number(localStorage.getItem("monthlyBudget")) || 0;
+
   if (ai) {
-    ai.textContent = monthly.length === 0
-      ? "No data yet 📊"
-      : generateAIInsight(monthly, weekly, categoryMap);
+    ai.textContent =
+      monthly.length === 0
+        ? "No data yet 📊"
+        : generateAIInsight(monthly, weekly, categoryMap, mExpense, budget);
+  }
+
+  // ================= BUDGET WARNING =================
+  const warn = document.getElementById("budget-warning");
+
+  if (warn && budget > 0) {
+    if (mExpense > budget) {
+      warn.textContent = "⚠️ You exceeded your budget!";
+      warn.style.color = "red";
+    } else {
+      warn.textContent = "✅ You are within budget";
+      warn.style.color = "green";
+    }
   }
 }
 
+// ================= RUN =================
 document.addEventListener("DOMContentLoaded", updateReports);
 
-// ================= PDF EXPORT =================
+// ================= PDF EXPORT (PRO FEATURE) =================
 document.addEventListener("DOMContentLoaded", () => {
 
   const btn = document.getElementById("exportPDF");
