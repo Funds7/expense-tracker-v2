@@ -46,13 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
         budgetStatus.textContent = `Budget saved: ₦${value}`;
       }
 
-      checkBudgetWarning(); // run check after saving
+      checkBudgetWarning();
     });
   }
 
-  // =========================
-  // 🚨 BUDGET WARNING CHECK
-  // =========================
   function checkBudgetWarning() {
     const budget = Number(localStorage.getItem("monthlyBudget") || 0);
     const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
@@ -95,11 +92,45 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================
   const proStatus = document.getElementById("proStatus");
 
-  if (proStatus) {
+  function updateProUI() {
     const isPro = localStorage.getItem("pro") === "true";
-    proStatus.textContent = isPro
-      ? "💎 PRO ACTIVE"
-      : "Free Plan (Upgrade Available)";
+
+    if (proStatus) {
+      proStatus.textContent = isPro
+        ? "💎 PRO ACTIVE"
+        : "Free Plan (Upgrade Available)";
+    }
   }
+
+  updateProUI();
+
+  // =========================
+  // 💳 PAYSTACK PRO UNLOCK HANDLER
+  // =========================
+  window.unlockProPlan = function(reference) {
+
+    fetch("https://your-backend.onrender.com/verify/" + reference)
+      .then(res => res.json())
+      .then(data => {
+
+        if (data.success) {
+          localStorage.setItem("pro", "true");
+
+          alert("🎉 Payment successful! PRO unlocked!");
+
+          updateProUI();
+
+          // optional refresh
+          location.reload();
+        } else {
+          alert("❌ Payment verification failed");
+        }
+
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Server error verifying payment");
+      });
+  };
 
 });
