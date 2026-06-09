@@ -108,17 +108,16 @@ document.addEventListener("DOMContentLoaded", updateReports);
 document.addEventListener("DOMContentLoaded", () => {
 
   const btn = document.getElementById("exportPDF");
-
   if (!btn) return;
 
-  btn.addEventListener("click", () => {
+  btn.addEventListener("click", (e) => {
+    e.preventDefault(); // 🛑 STOP ANY DEFAULT BEHAVIOR
 
-    // 🔒 PRO CHECK
     const isPro = localStorage.getItem("pro") === "true";
 
     if (!isPro) {
       alert("Upgrade to PRO to export PDF reports 💰");
-      return;
+      return; // 🛑 HARD STOP (VERY IMPORTANT)
     }
 
     const { jsPDF } = window.jspdf;
@@ -136,7 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let net = income - expense;
 
-    // PDF CONTENT
     doc.setFontSize(16);
     doc.text("Expense Tracker Report", 10, 10);
 
@@ -144,8 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.text("Total Income: ₦" + income, 10, 30);
     doc.text("Total Expense: ₦" + expense, 10, 40);
     doc.text("Net Balance: ₦" + net, 10, 50);
-    doc.text("Transactions: " + transactions.length, 10, 60);
+    doc.text("Total Transactions: " + transactions.length, 10, 60);
 
-    doc.save("finance-report.pdf");
+    doc.save("expense-report.pdf");
   });
+
 });
