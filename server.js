@@ -1,61 +1,47 @@
 const express = require("express");
-const axios = require("axios");
 const cors = require("cors");
-
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
-
-// Health check
+// 🟢 HOME ROUTE
 app.get("/", (req, res) => {
   res.send("Paystack backend is running 🚀");
 });
 
-// Verify payment
+// 🟢 HEALTH CHECK
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+// 🟢 PAYSTACK VERIFY ROUTE (MOCK FOR NOW)
 app.get("/verify/:reference", async (req, res) => {
   const reference = req.params.reference;
 
   try {
-    const response = await axios.get(
-      `https://api.paystack.co/transaction/verify/${reference}`,
-      {
-        headers: {
-          Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-        },
-      }
-    );
+    // TODO: later we connect real Paystack API here
 
-    const data = response.data.data;
+    console.log("Verifying payment:", reference);
 
-    if (data.status === "success") {
-      return res.json({
-        success: true,
-        message: "Payment verified",
-        email: data.customer.email,
-        amount: data.amount,
-        reference: data.reference,
-      });
-    }
-
+    // MOCK SUCCESS RESPONSE
     return res.json({
-      success: false,
-      message: "Payment not successful",
+      success: true,
+      message: "Payment verified",
+      reference: reference
     });
 
   } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({
+    console.error(error);
+    return res.json({
       success: false,
-      message: "Server error",
+      message: "Verification failed"
     });
   }
 });
 
+// 🟢 START SERVER
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port", PORT);
 });
